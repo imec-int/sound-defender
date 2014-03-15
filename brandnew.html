@@ -6,9 +6,17 @@
     <link rel="icon" href="/assets/favicon.ico" type="image/x-icon"/>
     <link rel="shortcut icon" href="/assets/favicon.ico"/>
     <script src="dist/paper.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <title>Paper.js - Paper.js</title>
 </head>
 <body class="fullscreen">
+<script>
+  var socket = io.connect('http://localhost');
+  socket.on('news', function (data) {
+    console.log(data);
+    socket.emit('my other event', { my: 'data' });
+  });
+</script>
 <script type="text/javascript">
 	var path;
 	var eq;

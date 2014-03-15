@@ -46,7 +46,7 @@
         <button type="button" class="shoot fa fa-circle"></button>
         <script>
 
-          var socket = io.connect('http://localhost');
+          var socket = io.connect('http://lacerta.be');
           socket.on('news', function (data) {
             console.log(data);
             socket.emit('my other event', { my: 'data' });

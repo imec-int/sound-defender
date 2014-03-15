@@ -144,7 +144,7 @@ function initFromMP3(url) {
           audio.play();
     }, false);
     var sourceNode = context.createMediaElementSource(audio);
-    var sourceNode.connect(analyser);
+    sourceNode.connect(analyser);
 
     javascriptNode.onaudioprocess = function() {
         soundArray =  new Uint8Array(analyser.frequencyBinCount);

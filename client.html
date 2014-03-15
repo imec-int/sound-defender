@@ -142,12 +142,12 @@
         socket.emit("shoot");
     });
 
-    document.getElem(".controller").on("touchstart", function(event) {
-         event.preventDefault();
-    })
-    document.getElem(".controller").on("touchend", function(event) {
-         event.preventDefault();
-    })
+    document.getElemAll(".controller, .loser").forEach(function(elem) {
+        elem.on("touchstart", function(event) { event.preventDefault(); })
+    });
+    document.getElemAll(".controller, .loser").forEach(function(elem) {
+        elem.on("touchend", function(event) { event.preventDefault(); })
+    });
   });
 
     setInterval(function(){

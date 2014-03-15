@@ -91,9 +91,17 @@
     down.on("touchcancel", function(event) { stopControlPad(event,"down"); })
     down.on("touchend", function(event) { stopControlPad(event,"down"); })
 
-    document.getElem(".shoot").on('click', function() {
+    document.getElem(".shoot").on('click', function(event) {
+        event.preventDefault();
         socket.emit("shoot");
     });
+
+    document.getElem(".controller").on("touchstart", function(event) {
+         event.preventDefault();
+    })
+    document.getElem(".controller").on("touchend", function(event) {
+         event.preventDefault();
+    })
   });
 
     setInterval(function(){

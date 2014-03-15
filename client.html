@@ -62,9 +62,11 @@
     var down=document.getElem(".controller .down");
 
     var startControlPad = function(direction) {
+        document.getElem("."+direction).style.backgroundColor = '#F00';
         window['direction'] = direction;
     }
     var stopControlPad = function(direction) {
+        document.getElem("."+direction).style.backgroundColor = 'transparent';
         if (window['direction'] === direction) {
             window['direction'] = '';
         }

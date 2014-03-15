@@ -46,7 +46,6 @@ function newcol(){
 var interval=setInterval(difficult,1000);
 function difficult(){
 	energythreshold++;
-	console.log(energythreshold);
 	if(energythreshold>100){
 		clearInterval(interval);
 	}
@@ -163,7 +162,7 @@ var audioBuffer;
 var javascriptNode;
 for(var i=0;i<5*bulletcount;i++){
     bulletpoints[i]=new Path.Circle({
-        radius:2,
+        radius:8,
         strokeColor:'black',
         fillColor:'white',
         center:{x:-100,y:-100}
@@ -294,12 +293,8 @@ function onKeyDown(event) {
 }
 playerheight=5;
 var height = view.size.height;
-step = height/10;
-    players=[];/*{xpos:10,currentHeight:5,currentpixel:5*step,target:5,direction:0},
-    {xpos:13,currentHeight:5,currentpixel:5*step,target:5,direction:0},
-    {xpos:16,currentHeight:5,currentpixel:5*step,target:5,direction:0},
-    {xpos:19,currentHeight:5,currentpixel:5*step,target:5,direction:0},
-    {xpos:22,currentHeight:5,currentpixel:5*step,target:5,direction:0}];*/
+step = height/20;
+    players=[];
 for(var i=0;i<5;i++){
     var player={xpos:10+(i*3),currentHeight:5,currentpixel:5*step,target:5,direction:0};
     var bullets=[];
@@ -310,8 +305,6 @@ for(var i=0;i<5;i++){
     players[i]=player;
 }
 function onKeyUp(event){
-    console.log("keyup");
-    console.log(event);
     if(event.key=="a"){
         changeHeight(0,-1);
         /*playerheight--;
@@ -476,10 +469,12 @@ function onFrame(event) {
                     if(players[i].bullets[j].active){
                         bulletpoints[i+(j*5)].position.x=players[i].bullets[j].currentpixel;
                         bulletpoints[i+(j*5)].position.y=players[i].bullets[j].y;
-                        var reference=path.segments[Math.floor(bulletpoints[i*j].position.x*128/viewding)].point.y;
+                        var reference=path.segments[Math.floor(bulletpoints[i+(j*5)].position.x*128/viewding)].point.y;
                         if(bulletpoints[i+(j*5)].position.y>=reference || bulletpoints[i+(j*5)].position.x>viewding){
                             players[i].bullets[j].active=false;
                             players[i].bullets[j].currentpixel=-100;
+                            bulletpoints[i+(j*5)].position.y=-100;
+                            bulletpoints[i+(j*5)].position.x=-100;
                         }
                     }
                 }

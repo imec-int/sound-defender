@@ -22,6 +22,9 @@
     socket.on('up',function(data){
         changeHeight(data.player,-1);
     });
+    socket.on('shoot',function(data){
+        shoot(data.player);
+    });
   });
 </script>
 <script type="text/javascript">
@@ -86,25 +89,32 @@ function rnd(num){
     var step=0;
 
 setInterval(movePlayers,10);
-
+var bulletspeed=10;
+var bulletcount=5;
+var bulletpoints=[];
 function movePlayers(){
     for(var i=0;i<players.length;i++){
         pl=players[i];
         if(pl.currentpixel<pl.target*step){
-            pl.currentpixel+=step/5;
+            pl.currentpixel+=step/10;
             if(pl.currentpixel>pl.target*step){
                 pl.currentpixel=pl.target*step;
                 pl.direction=0;
             }
         }else if(pl.currentpixel>pl.target*step){
-            pl.currentpixel-=step/5;
+            pl.currentpixel-=step/10;
             if(pl.currentpixel<pl.target*step){
                 pl.currentpixel=pl.target*step;
                 pl.direction=0;
             }
         }
         pl.currentHeight=Math.floor(pl.currentpixel/step);
-           
+        for(var j=0;j<pl.bullets.length;j++){
+            var bullet = pl.bullets[j];
+            if(bullet.active){
+                bullet.currentpixel+=bulletspeed;
+            }
+        }   
     }
 }
 function changeHeight(playernr,height){
@@ -124,6 +134,20 @@ function changeHeight(playernr,height){
         players[playernr].target=0;
     }
 };
+function shoot(playernr){
+    if(playernr>players.length-1){
+        return;
+    }
+    for(var i=0;i<bulletcount;i++){
+        var bullet = players[playernr].bullets[i];
+        if(!bullet.active){
+            bullet.active=true;
+            bullet.y=players[playernr].currentpixel;
+            bullet.currentpixel=(players[playernr].xpos+1)*view.size.width/128;
+            break;
+        }
+    }    
+}
 </script>
 <script type="text/paperscript" canvas="canvas-1">
 var width, height, center;
@@ -137,7 +161,14 @@ var analyser;
 var buffer;
 var audioBuffer;
 var javascriptNode;
-
+for(var i=0;i<5*bullets.length;i++){
+    bulletpoints[i]=new Path.Circle({
+        radius:2,
+        strokeColor:'black',
+        fillColor:'white',
+        center:{x:-100,y:-100}
+    });
+}
 eq = new Path();
 eq.fillColor = 'rgba(0,0,0,0.5)';
 path = new Path();
@@ -262,7 +293,7 @@ function onKeyDown(event) {
 }
 playerheight=5;
 var height = view.size.height;
-step = height/20;
+step = height/10;
     players=[{xpos:10,currentHeight:5,currentpixel:5*step,target:5,direction:0},
     {xpos:13,currentHeight:5,currentpixel:5*step,target:5,direction:0},
     {xpos:16,currentHeight:5,currentpixel:5*step,target:5,direction:0},
@@ -428,6 +459,15 @@ function onFrame(event) {
                     players[i].currentHeight=0;
                     players[i].target=0;
                     p.position.y=0;
+                }
+                for(var j=0;i<bulletcount;j++){
+                    bulletpoints[i*j].position.x=players[i].bullets[j].currentpixel;
+                    view.size.width/128
+                    var reference=path.segments[Math.floor(bulletpoints[i*j].position.x*view.size.with/128)].point.y;
+                    if(bulletpoints[i*j].position.y>=reference){
+                        players[i].bullets[j].active=false;
+                        players[i].bullets[j].currentpixel=-100;
+                    }
                 }
             }
             /*player.position.y=players[0].currentpixel;

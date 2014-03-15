@@ -10,8 +10,6 @@
 <script>
   var socket = io.connect('http://lacerta.be');
   socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
     socket.emit('host');
     socket.on('down',function(data){
         changeHeight(data.player,1);
@@ -23,6 +21,9 @@
         shoot(data.player);
     });
   });
+  function kill(player){
+    socket.emit("kill",{player:player});
+  }
 </script>
 <script type="text/javascript">
 	var path;
@@ -461,6 +462,7 @@ function onFrame(event) {
                     players[i].currentHeight=0;
                     players[i].target=0;
                     p.position.y=0;
+                    kill(i);
                 }
                 for(var j=0;j<bulletcount;j++){
                     if(players[i].bullets[j].active){

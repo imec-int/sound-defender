@@ -57,6 +57,8 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="elem.js"></script>
   <script>
+  var socket = io.connect('http://lacerta.be');
+
   document.ready(function() {
     var up=document.getElem(".controller .up");
     var down=document.getElem(".controller .down");
@@ -66,7 +68,7 @@
         window['direction'] = direction;
     }
     var stopControlPad = function(direction) {
-        document.getElem("."+direction).style.backgroundColor = 'transparent';
+        document.getElem("."+direction).style.backgroundColor = '#0F0';
         if (window['direction'] === direction) {
             window['direction'] = '';
         }
@@ -101,7 +103,7 @@
         <div class="shoot"></div>
         <div class="start"></div>
     </div>
-
+    <div class="direction"></div>
 
         <!--button type="button" class="up fa fa-arrow-up"></button>
         <button type="button" class="down fa fa-arrow-down"></button>

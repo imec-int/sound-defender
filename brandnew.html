@@ -34,7 +34,7 @@
 
     var url = 'test.mp3';
     var graphType = 'loudness' // numba, loudness, level
-
+var colors=["#FF00FF","#FFFF00","#00FF00","#00FFFF","#0000FF"];
 function newcol(){
 	var h=rnd(360),l=rnd(30);
 	document.body.style.backgroundColor="hsl("+h+",50%,"+(100-l)+"%)";
@@ -142,12 +142,22 @@ eq = new Path();
 eq.fillColor = 'rgba(0,0,0,0.5)';
 path = new Path();
 path.fillColor = 'black';
-player=new Path.Circle({
+playcollection=[];
+for(var i=0;i<5;i++){
+    var p=new Path.Circle({
+        radius:10,
+        strokeColor:'black',
+        fillColor:colors[i],
+        center:{x:(10+(i*3))*view.size.width/128,y:view.center.y-10}
+    });
+    playcollection[i]=p;
+}
+/*player=new Path.Circle({
 	radius:10,
 	strokeColor: 'black',
 	fillColor: 'orange',
 	center:{x:10*view.size.width/128, y:view.center.y-10}
-});
+});*/
 initializePath();
 initializeEQ();
 function initializePath() {
@@ -248,14 +258,16 @@ var averagevolume=0;
 var velocity=0;
 var gravity=.9;
 function onKeyDown(event) {
-	if(Math.abs(player.position.y+10-path.segments[10].point.y)<10){
-		velocity=20;
-	}
+	
 }
 playerheight=5;
 var height = view.size.height;
-step = height/40;
-    players=[{xpos:10,currentHeight:5,currentpixel:5*step,target:5,direction:0}];
+step = height/20;
+    players=[{xpos:10,currentHeight:5,currentpixel:5*step,target:5,direction:0},
+    {xpos:13,currentHeight:5,currentpixel:5*step,target:5,direction:0},
+    {xpos:16,currentHeight:5,currentpixel:5*step,target:5,direction:0},
+    {xpos:19,currentHeight:5,currentpixel:5*step,target:5,direction:0},
+    {xpos:22,currentHeight:5,currentpixel:5*step,target:5,direction:0}];
 function onKeyUp(event){
     console.log("keyup");
     console.log(event);
@@ -408,13 +420,23 @@ function onFrame(event) {
 					}
 				}
 			}*/
-            player.position.y=players[0].currentpixel;
+            for(var i=0;i<5;i++){
+                var p=playcollection[i];
+                p.position.y=players[i].currentpixel;
+                if(p.position.y+10>path.segments[10+(i*3)].point.y){
+                    players[i].currentpixel=0;
+                    players[i].currentHeight=0;
+                    players[i].target=0;
+                    p.position.y=0;
+                }
+            }
+            /*player.position.y=players[0].currentpixel;
             if(player.position.y+10>path.segments[10].point.y){
                 players[0].currentpixel=0;
                 players[0].currentHeight=0;
                 players[0].target=0;
                 player.position.y=0;
-            }
+            }*/
 			velocity-=gravity;
 			eq.smooth();
             if (smooth)

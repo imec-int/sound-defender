@@ -2,19 +2,14 @@
 <html>
 <head>
     <meta charset="UTF-8"/>
-    <link rel="stylesheet" href="/assets/css/style.css"/>
-    <link rel="icon" href="/assets/favicon.ico" type="image/x-icon"/>
-    <link rel="shortcut icon" href="/assets/favicon.ico"/>
     <script src="dist/paper.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <title>Paper.js - Paper.js</title>
 </head>
-<body class="fullscreen">
+<body style="overflow:hidden">
 <script>
   var socket = io.connect('http://lacerta.be');
   socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
     socket.emit('host');
     socket.on('down',function(data){
         changeHeight(data.player,1);
@@ -26,6 +21,9 @@
         shoot(data.player);
     });
   });
+  function kill(player){
+    socket.emit("kill",{player:player});
+  }
 </script>
 <script type="text/javascript">
 	var path;
@@ -464,6 +462,7 @@ function onFrame(event) {
                     players[i].currentHeight=0;
                     players[i].target=0;
                     p.position.y=0;
+                    kill(i);
                 }
                 for(var j=0;j<bulletcount;j++){
                     if(players[i].bullets[j].active){

@@ -11,10 +11,17 @@
 </head>
 <body class="fullscreen">
 <script>
-  var socket = io.connect('http://localhost');
+  var socket = io.connect('http://lacerta.be');
   socket.on('news', function (data) {
     console.log(data);
     socket.emit('my other event', { my: 'data' });
+    socket.emit('host');
+    socket.on('down',function(data){
+        changeHeight(data.player,1);
+    });
+    socket.on('up',function(data){
+        changeHeight(data.player,-1);
+    });
   });
 </script>
 <script type="text/javascript">
@@ -75,6 +82,48 @@ function rnd(num){
             }
         }
     }
+    var players=[];
+    var step=0;
+
+setInterval(movePlayers,10);
+
+function movePlayers(){
+    for(var i=0;i<players.length;i++){
+        pl=players[i];
+        if(pl.currentpixel<pl.target*step){
+            pl.currentpixel+=step/5;
+            if(pl.currentpixel>pl.target*step){
+                pl.currentpixel=pl.target*step;
+                pl.direction=0;
+            }
+        }else if(pl.currentpixel>pl.target*step){
+            pl.currentpixel-=step/5;
+            if(pl.currentpixel<pl.target*step){
+                pl.currentpixel=pl.target*step;
+                pl.direction=0;
+            }
+        }
+        pl.currentHeight=Math.floor(pl.currentpixel/step);
+           
+    }
+}
+function changeHeight(playernr,height){
+    if(playernr>players.length-1){
+        return;
+    }
+    if(players[playernr].direction==height){
+        players[playernr].target=players[playernr].target+height;
+
+    }else{
+        players[playernr].target=players[playernr].currentHeight+height;    
+    }
+    players[playernr].direction=height;
+    if(players[playernr].target>40){
+        players[playernr].target=40;
+    }else if(players[playernr].target<0){
+        players[playernr].target=0;
+    }
+};
 </script>
 <script type="text/paperscript" canvas="canvas-1">
 var width, height, center;
@@ -203,11 +252,31 @@ function onKeyDown(event) {
 		velocity=20;
 	}
 }
+playerheight=5;
+var height = view.size.height;
+step = height/40;
+    players=[{xpos:10,currentHeight:5,currentpixel:5*step,target:5,direction:0}];
+function onKeyUp(event){
+    console.log("keyup");
+    console.log(event);
+    if(event.key=="a"){
+        changeHeight(0,-1);
+        /*playerheight--;
+        if(playerheight<0){
+            playerheight=0;
+        }*/
+    }else if(event.key=="q"){
+        changeHeight(0,1);
+/*        playerheight++;
+        if(playerheight>40){
+            playerheight=40;
+        }*/
+    }
+}
 
 var loudnessHistory = new Array(points);
 var beatHistory = new Array(points);
 var numbaHistory = new Array(points);
-
 function onFrame(event) {
           if (soundArray) {
             var varue=-1;
@@ -326,7 +395,7 @@ function onFrame(event) {
             path.segments[last].point.y=path.segments[last-1].point.y-energy;
 //path.segments[last].point.y=value;
 
-			player.position.y-=velocity;
+			/*player.position.y-=velocity;
 			if(player.position.y+10>path.segments[11].point.y){
 				velocity+=player.position.y+10-path.segments[11].point.y
 				player.position.y=path.segments[11].point.y-10;
@@ -338,7 +407,14 @@ function onFrame(event) {
 						velocity=0;
 					}
 				}
-			}
+			}*/
+            player.position.y=players[0].currentpixel;
+            if(player.position.y+10>path.segments[10].point.y){
+                players[0].currentpixel=0;
+                players[0].currentHeight=0;
+                players[0].target=0;
+                player.position.y=0;
+            }
 			velocity-=gravity;
 			eq.smooth();
             if (smooth)

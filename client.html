@@ -58,6 +58,7 @@
   <script src="elem.js"></script>
   <script>
   var socket = io.connect('http://lacerta.be');
+  var direction = '';
 
   document.ready(function() {
     var up=document.getElem(".controller .up");
@@ -74,8 +75,6 @@
         }
     }
 
-    var direction = '';
-
     up.on("touchstart", function() { startControlPad("up"); })
     up.on("touchenter", function() { startControlPad("up"); })
     up.on("touchleave", function() { stopControlPad("up"); })
@@ -87,14 +86,13 @@
     down.on("touchleave", function() { stopControlPad("down"); })
     down.on("touchcancel", function() { stopControlPad("down"); })
     down.on("touchend", function() { stopControlPad("down"); })
+  });
 
     setInterval(function(){
         if (direction) {
             socket.emit(direction);
         }
     },500);
-
-  });
 
   </script>
 </head>

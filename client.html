@@ -14,6 +14,7 @@
         width: 100%;
         height: 100%;
         font-size: 13px;
+        overflow: hidden;
     }
     .controller {
         background: url('controller.svg');
@@ -51,6 +52,22 @@
         right: 22%;
         bottom: 0%
     }
+
+    .loser {
+        display: none;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        position: absolute;
+        z-index: 1000;
+        background: url('loser.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+    .loser .share {
+        
+    }
   </style>
 
   <script src="http://lacerta.be/socket.io/socket.io.js"></script>
@@ -59,6 +76,12 @@
   var socket = io.connect('http://lacerta.be');
   socket.on('connect', function () {
      socket.emit("client");
+  })
+  socket.on('ok', function(data) {
+     document.getElem("body").style.backgroundColor = data.color;
+  })
+  socket.on('dead', function(data) {
+     document.getElem("body").style.backgroundColor = data.color;
   })
 
   var direction = '';
@@ -101,7 +124,7 @@
     down.on("touchcancel", function(event) { stopControlPad(event,"down"); })
     down.on("touchend", function(event) { stopControlPad(event,"down"); })
 
-    document.getElem(".shoot").on('click', function(event) {
+    document.getElem(".shoot").on('touchstart', function(event) {
         event.preventDefault();
         socket.emit("shoot");
     });
@@ -129,8 +152,19 @@
         <div class="shoot"></div>
         <div class="start"></div>
     </div>
-    <div class="direction"></div>
-
+    <div class="loser">
+        <div class="share">
+            <label>Share this on: </label>
+            <button type="button" class="twitter">
+                <span class="fa fa-twitter"></span>
+                Twitter
+            </button>
+            <button type="button" class="googleplus">
+                <span class="fa fa-google-plus"></span>
+                Google+
+            </button>
+        </div>
+    </div>
         <!--button type="button" class="up fa fa-arrow-up"></button>
         <button type="button" class="down fa fa-arrow-down"></button>
         <button type="button" class="shoot fa fa-circle"></button>

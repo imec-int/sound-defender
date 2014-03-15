@@ -47,7 +47,9 @@
         <script>
 
         var socket = io.connect('http://lacerta.be');
-        socket.emit("client");
+        socket.on('connect', function () {
+            socket.emit("client");
+        })
         socket.on("ok", function(data) {
             document.getElem("body").style.backgroundColor = data.color;
         });

@@ -17,6 +17,7 @@
     var energythreshold=1; // how much the previous point can differ from the next point
     var volgraph=false; // set to true to create graph based on volume
 
+    var url = 'test.mp3';
     var graphType = 'loudness' // numba, loudness, level
 
 function newcol(){
@@ -122,8 +123,35 @@ function initializeEQ() {
     eq.fullySelected = false;
 }
 function loadSound() {
-    navigator.webkitGetUserMedia({audio:true}, initAudio, onError);
+    if (url) {
+        initFromMP3(url);
+    } else {
+        navigator.webkitGetUserMedia({audio:true}, initAudio, onError);
+    }
 }
+
+function initFromMP3(url) {
+    context = new AudioContext();
+    javascriptNode = context.createScriptProcessor(256, 2, 1);
+    javascriptNode.connect(context.destination);
+    
+    analyser = context.createAnalyser();
+
+    var audio = new Audio();
+    audio.src = url;
+
+    audio.addEventListener('canplaythrough', function() {
+          audio.play();
+    }, false);
+    var sourceNode = context.createMediaElementSource(audio);
+    var sourceNode.connect(analyser);
+
+    javascriptNode.onaudioprocess = function() {
+        soundArray =  new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(soundArray);
+    }
+}
+
 function initAudio(stream) {
     context = new webkitAudioContext();
     javascriptNode = context.createScriptProcessor(256, 2, 1);
@@ -144,6 +172,7 @@ function initAudio(stream) {
         analyser.getByteFrequencyData(soundArray);
     }
 }
+
 // log if an error occurs
 function onError(e) {
     console.log(e);

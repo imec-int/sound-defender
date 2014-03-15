@@ -473,6 +473,8 @@ function onFrame(event) {
                         if(bulletpoints[i+(j*5)].position.y>=reference || bulletpoints[i+(j*5)].position.x>viewding){
                             players[i].bullets[j].active=false;
                             players[i].bullets[j].currentpixel=-100;
+                            bulletpoints[i+(j*5)].position.y=-100;
+                            bulletpoints[i+(j*5)].position.x=-100;
                         }
                     }
                 }

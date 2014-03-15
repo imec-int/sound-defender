@@ -58,11 +58,8 @@
   <script src="elem.js"></script>
   <script>
   document.ready(function() {
-    var control_pad = document.getElem(".control_pad");
-    control_pad.style.width = control_pad.clientHeight+"px";
-
-    var up=document.getElem("up");
-    var down=document.getElem("up");
+    var up=document.getElem(".controller .up");
+    var down=document.getElem(".controller .down");
 
     var startControlPad = function(direction) {
         window['direction'] = direction;

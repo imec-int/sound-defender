@@ -46,23 +46,23 @@
         <button type="button" class="shoot fa fa-circle"></button>
         <script>
 
-          var socket = io.connect('http://lacerta.be');
-          socket.on('news', function (data) {
-            console.log(data);
-            socket.emit('my other event', { my: 'data' });
-          });
-
-
-
-            document.getElem("button.up").on("click", function() {
-                socket.emit("up");
-            });
-            document.getElem("button.down").on("click", function() {
-                socket.emit("down");
-            });
-            document.getElem("button.shoot").on("click", function() {
-                socket.emit("shoot");
-            });
+        var socket = io.connect('http://lacerta.be');
+        socket.emit("client");
+        socket.on("ok", function(data) {
+            document.getElem("body").style.backgroundColor = data.color;
+        });
+        socket.on("nok", function(data) {
+            document.getElem("body").innerHTML = '<div class="message">Too many clients</div>';
+        });
+        document.getElem("button.up").on("click", function() {
+            socket.emit("up");
+        });
+        document.getElem("button.down").on("click", function() {
+            socket.emit("down");
+        });
+        document.getElem("button.shoot").on("click", function() {
+            socket.emit("shoot");
+        });
         </script>
   </body>
 </html>

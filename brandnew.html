@@ -46,7 +46,6 @@ function newcol(){
 var interval=setInterval(difficult,1000);
 function difficult(){
 	energythreshold++;
-	console.log(energythreshold);
 	if(energythreshold>100){
 		clearInterval(interval);
 	}
@@ -294,7 +293,7 @@ function onKeyDown(event) {
 }
 playerheight=5;
 var height = view.size.height;
-step = height/10;
+step = height/20;
     players=[];
 for(var i=0;i<5;i++){
     var player={xpos:10+(i*3),currentHeight:5,currentpixel:5*step,target:5,direction:0};

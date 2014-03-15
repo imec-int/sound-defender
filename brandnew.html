@@ -2,14 +2,11 @@
 <html>
 <head>
     <meta charset="UTF-8"/>
-    <link rel="stylesheet" href="/assets/css/style.css"/>
-    <link rel="icon" href="/assets/favicon.ico" type="image/x-icon"/>
-    <link rel="shortcut icon" href="/assets/favicon.ico"/>
     <script src="dist/paper.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <title>Paper.js - Paper.js</title>
 </head>
-<body class="fullscreen">
+<body style="overflow:hidden">
 <script>
   var socket = io.connect('http://lacerta.be');
   socket.on('news', function (data) {

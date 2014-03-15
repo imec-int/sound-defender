@@ -92,7 +92,9 @@
      document.getElem("body").style.backgroundColor = data.color;
   })
   socket.on('dead', function(data) {
-     document.getElem("body").style.backgroundColor = data.color;
+     document.getElem("body").style.backgroundColor = 'transparent';
+     document.getElem(".loser").style.display = 'block';
+     socket.disconnect();
   })
 
   var direction = '';

@@ -80,11 +80,13 @@
     up.on("touchenter", function() { startControlPad("up"); })
     up.on("touchleave", function() { stopControlPad("up"); })
     up.on("touchcancel", function() { stopControlPad("up"); })
+    up.on("touchend", function() { stopControlPad("up"); })
 
     down.on("touchstart", function() { startControlPad("down"); })
     down.on("touchenter", function() { startControlPad("down"); })
     down.on("touchleave", function() { stopControlPad("down"); })
     down.on("touchcancel", function() { stopControlPad("down"); })
+    down.on("touchend", function() { stopControlPad("down"); })
 
     setInterval(function(){
         if (direction) {

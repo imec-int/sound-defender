@@ -5,43 +5,123 @@
   <meta charset="UTF-8"/>
   <title>Sound defender client</title>
 
-   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+   <meta name="viewport" content="width=1000px, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
   <style>
-    html {
-        height: 60%;
+    html, body {
+        height: 100%;
     }
     body {
-        height: 60%;
+        width: 960px;
+        height: 390px;
+        font-size: 13px;
     }
-    button {
+    .controller {
+        background: url('controller.svg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        width: 960px;
+        height: 390px;
+        position: relative;
+    }
+    .controller .up {
+        width: 450px;
+        height: 195px;
         position: absolute;
-        height: 30%;
-        width: 30%;
-        font-size: 25vh;
-        background-color: transparent;
-        border: 0px;
+        left: 0px;
+        top: 0px;
     }
-    .up {
-        left: 10%;
-        top: 10%;
+    .controller .down {
+        width: 450px;
+        height: 195px;
+        position: absolute;
+        left: 0px;
+        bottom: 0px;
     }
-    .down {
-        left: 10%;
-        bottom: 10%;
+    .controller .shoot {
+        width: 200px;
+        height: 200px;
+        position: absolute;
+        right: 20px;
+        bottom: 60px;
     }
-    .shoot {
-        left: 60%;
-        top: 35%;
-        color: red;
+    .controller .start {
+        width: 200px;
+        height: 200px;
+        position: absolute;
+        right: 220px;
+        bottom: 60px;
     }
   </style>
 
-    <script src="/socket.io/socket.io.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
   <script src="elem.js"></script>
+  <script>
+  var socket = io.connect('http://lacerta.be');
+  socket.on('connect', function () {
+     socket.emit("client");
+  })
+
+  var direction = '';
+
+  document.ready(function() {
+    var up=document.getElem(".controller .up");
+    var down=document.getElem(".controller .down");
+
+    var startControlPad = function(event,direction) {
+        event.preventDefault();
+        window['direction'] = direction;
+    }
+    var stopControlPad = function(event,direction) {
+        event.preventDefault();
+        if (window['direction'] === direction) {
+            window['direction'] = '';
+        }
+    }
+
+    up.on("touchstart", function(event) { startControlPad(event,"up"); })
+    up.on("touchenter", function(event) { startControlPad(event,"up"); })
+    up.on("touchleave", function(event) { stopControlPad(event,"up"); })
+    up.on("touchcancel", function(event) { stopControlPad(event,"up"); })
+    up.on("touchend", function(event) { stopControlPad(event,"up"); })
+
+    down.on("touchstart", function(event) { startControlPad(event,"down"); })
+    down.on("touchenter", function(event) { startControlPad(event,"down"); })
+    down.on("touchleave", function(event) { stopControlPad(event,"down"); })
+    down.on("touchcancel", function(event) { stopControlPad(event,"down"); })
+    down.on("touchend", function(event) { stopControlPad(event,"down"); })
+
+    document.getElem(".shoot").on('click', function(event) {
+        event.preventDefault();
+        socket.emit("shoot");
+    });
+
+    document.getElem(".controller").on("touchstart", function(event) {
+         event.preventDefault();
+    })
+    document.getElem(".controller").on("touchend", function(event) {
+         event.preventDefault();
+    })
+  });
+
+    setInterval(function(){
+        if (direction) {
+            socket.emit(direction);
+        }
+    },100);
+
+  </script>
 </head>
   <body>
-        <button type="button" class="up fa fa-arrow-up"></button>
+    <div class="controller">
+        <div class="up"></div>
+        <div class="down"></div>
+        <div class="shoot"></div>
+        <div class="start"></div>
+    </div>
+    <div class="direction"></div>
+
+        <!--button type="button" class="up fa fa-arrow-up"></button>
         <button type="button" class="down fa fa-arrow-down"></button>
         <button type="button" class="shoot fa fa-circle"></button>
         <script>
@@ -52,6 +132,9 @@
         })
         socket.on("ok", function(data) {
             document.getElem("body").style.backgroundColor = data.color;
+            document.getElemAll("button").forEach(function(elem) {
+                elem.style.display = 'block';
+            });
         });
         socket.on("nok", function(data) {
             document.getElem("body").innerHTML = '<div class="message">Too many clients</div>';
@@ -65,6 +148,6 @@
         document.getElem("button.shoot").on("click", function() {
             socket.emit("shoot");
         });
-        </script>
+        </script-->
   </body>
 </html>

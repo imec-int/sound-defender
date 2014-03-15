@@ -52,7 +52,15 @@
         right: 22%;
         bottom: 0%
     }
-
+    .controller .kabeltje {
+        position: absolute;
+        left: 50%;
+        top: -4em;
+        background-color: #000;
+        z-index: -100;
+        width: 2em;
+        height: 10em;
+    }
     .loser {
         display: none;
         top: 0;
@@ -66,7 +74,10 @@
         background-repeat: no-repeat;
     }
     .loser .share {
-        
+        position: absolute;
+        width: 100%;
+        text-align: center;
+
     }
   </style>
 
@@ -147,6 +158,7 @@
 </head>
   <body>
     <div class="controller">
+        <div class="kabeltje"></div>
         <div class="up"></div>
         <div class="down"></div>
         <div class="shoot"></div>

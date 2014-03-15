@@ -68,26 +68,32 @@
     var up=document.getElem(".controller .up");
     var down=document.getElem(".controller .down");
 
-    var startControlPad = function(direction) {
+    var startControlPad = function(event,direction) {
+        event.preventDefault();
         window['direction'] = direction;
     }
-    var stopControlPad = function(direction) {
+    var stopControlPad = function(event,direction) {
+        event.preventDefault();
         if (window['direction'] === direction) {
             window['direction'] = '';
         }
     }
 
-    up.on("touchstart", function() { startControlPad("up"); })
-    up.on("touchenter", function() { startControlPad("up"); })
-    up.on("touchleave", function() { stopControlPad("up"); })
-    up.on("touchcancel", function() { stopControlPad("up"); })
-    up.on("touchend", function() { stopControlPad("up"); })
+    up.on("touchstart", function(event) { startControlPad(event,"up"); })
+    up.on("touchenter", function(event) { startControlPad(event,"up"); })
+    up.on("touchleave", function(event) { stopControlPad(event,"up"); })
+    up.on("touchcancel", function(event) { stopControlPad(event,"up"); })
+    up.on("touchend", function(event) { stopControlPad(event,"up"); })
 
-    down.on("touchstart", function() { startControlPad("down"); })
-    down.on("touchenter", function() { startControlPad("down"); })
-    down.on("touchleave", function() { stopControlPad("down"); })
-    down.on("touchcancel", function() { stopControlPad("down"); })
-    down.on("touchend", function() { stopControlPad("down"); })
+    down.on("touchstart", function(event) { startControlPad(event,"down"); })
+    down.on("touchenter", function(event) { startControlPad(event,"down"); })
+    down.on("touchleave", function(event) { stopControlPad(event,"down"); })
+    down.on("touchcancel", function(event) { stopControlPad(event,"down"); })
+    down.on("touchend", function(event) { stopControlPad(event,"down"); })
+
+    document.getElem(".shoot").on('click', function() {
+        socket.emit("shoot");
+    });
   });
 
     setInterval(function(){

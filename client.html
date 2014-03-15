@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <title>Sound defender client</title>
+
+   <meta name="viewport" content="width=device-width">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <style>
+    html {
+        height: 60%;
+    }
+    body {
+        height: 60%;
+    }
+    button {
+        position: absolute;
+        height: 30%;
+        width: 30%;
+        font-size: 25vh;
+        background-color: transparent;
+        border: 0px;
+    }
+    .up {
+        left: 10%;
+        top: 10%;
+    }
+    .down {
+        left: 10%;
+        bottom: 10%;
+    }
+    .shoot {
+        left: 60%;
+        top: 35%;
+        color: red;
+    }
+  </style>
+
+    <script src="/socket.io/socket.io.js"></script>
+  <script src="elem.js"></script>
+</head>
+  <body>
+        <button type="button" class="up fa fa-arrow-up"></button>
+        <button type="button" class="down fa fa-arrow-down"></button>
+        <button type="button" class="shoot fa fa-circle"></button>
+        <script>
+
+          var socket = io.connect('http://localhost');
+          socket.on('news', function (data) {
+            console.log(data);
+            socket.emit('my other event', { my: 'data' });
+          });
+
+
+
+            document.getElem("button.up").on("click", function() {
+
+            });
+        </script>
+  </body>
+</html>

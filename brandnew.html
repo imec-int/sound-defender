@@ -34,7 +34,7 @@
     var oomph=1000; // the beat threshold
     var energythreshold=1; // how much the previous point can differ from the next point
     var booms=false;
-
+    var viewding=0;
     var url = 'test.mp3';
     var graphType = 'loudness' // numba, loudness, level
 var colors=["#FF00FF","#FFFF00","#00FF00","#00FFFF","#0000FF"];
@@ -89,7 +89,7 @@ function rnd(num){
     var step=0;
 
 setInterval(movePlayers,10);
-var bulletspeed=10;
+var bulletspeed=20;
 var bulletcount=5;
 var bulletpoints=[];
 function movePlayers(){
@@ -140,10 +140,10 @@ function shoot(playernr){
     }
     for(var i=0;i<bulletcount;i++){
         var bullet = players[playernr].bullets[i];
-        if(!bullet.active){
-            bullet.active=true;
-            bullet.y=players[playernr].currentpixel;
-            bullet.currentpixel=(players[playernr].xpos+1)*view.size.width/128;
+        if(!players[playernr].bullets[i].active){
+            players[playernr].bullets[i].active=true;
+            players[playernr].bullets[i].y=players[playernr].currentpixel;
+            players[playernr].bullets[i].currentpixel=(players[playernr].xpos+1)*viewding/128;
             break;
         }
     }    
@@ -161,7 +161,7 @@ var analyser;
 var buffer;
 var audioBuffer;
 var javascriptNode;
-for(var i=0;i<5*bullets.length;i++){
+for(var i=0;i<5*bulletcount;i++){
     bulletpoints[i]=new Path.Circle({
         radius:2,
         strokeColor:'black',
@@ -183,6 +183,7 @@ for(var i=0;i<5;i++){
     });
     playcollection[i]=p;
 }
+viewding=view.size.width;
 /*player=new Path.Circle({
 	radius:10,
 	strokeColor: 'black',
@@ -294,11 +295,20 @@ function onKeyDown(event) {
 playerheight=5;
 var height = view.size.height;
 step = height/10;
-    players=[{xpos:10,currentHeight:5,currentpixel:5*step,target:5,direction:0},
+    players=[];/*{xpos:10,currentHeight:5,currentpixel:5*step,target:5,direction:0},
     {xpos:13,currentHeight:5,currentpixel:5*step,target:5,direction:0},
     {xpos:16,currentHeight:5,currentpixel:5*step,target:5,direction:0},
     {xpos:19,currentHeight:5,currentpixel:5*step,target:5,direction:0},
-    {xpos:22,currentHeight:5,currentpixel:5*step,target:5,direction:0}];
+    {xpos:22,currentHeight:5,currentpixel:5*step,target:5,direction:0}];*/
+for(var i=0;i<5;i++){
+    var player={xpos:10+(i*3),currentHeight:5,currentpixel:5*step,target:5,direction:0};
+    var bullets=[];
+    for(var j=0;j<bulletcount;j++){
+        bullets[j]={active:false,currentpixel:-100,y:-100};
+    }
+    player.bullets=bullets;
+    players[i]=player;
+}
 function onKeyUp(event){
     console.log("keyup");
     console.log(event);
@@ -314,6 +324,8 @@ function onKeyUp(event){
         if(playerheight>40){
             playerheight=40;
         }*/
+    }else if(event.key=="m"){
+        shoot(0);
     }
 }
 
@@ -460,15 +472,18 @@ function onFrame(event) {
                     players[i].target=0;
                     p.position.y=0;
                 }
-                for(var j=0;i<bulletcount;j++){
-                    bulletpoints[i*j].position.x=players[i].bullets[j].currentpixel;
-                    view.size.width/128
-                    var reference=path.segments[Math.floor(bulletpoints[i*j].position.x*view.size.with/128)].point.y;
-                    if(bulletpoints[i*j].position.y>=reference){
-                        players[i].bullets[j].active=false;
-                        players[i].bullets[j].currentpixel=-100;
+                for(var j=0;j<bulletcount;j++){
+                    if(players[i].bullets[j].active){
+                        bulletpoints[i+(j*5)].position.x=players[i].bullets[j].currentpixel;
+                        bulletpoints[i+(j*5)].position.y=players[i].bullets[j].y;
+                        var reference=path.segments[Math.floor(bulletpoints[i*j].position.x*128/viewding)].point.y;
+                        if(bulletpoints[i+(j*5)].position.y>=reference || bulletpoints[i+(j*5)].position.x>viewding){
+                            players[i].bullets[j].active=false;
+                            players[i].bullets[j].currentpixel=-100;
+                        }
                     }
                 }
+    
             }
             /*player.position.y=players[0].currentpixel;
             if(player.position.y+10>path.segments[10].point.y){

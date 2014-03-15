@@ -141,7 +141,6 @@ function initFromMP3(url) {
     audio.src = url;
 
     audio.addEventListener('canplaythrough', function() {
-        audio.muted = false;
           audio.play();
     }, false);
     var sourceNode = context.createMediaElementSource(audio);

@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <title>Sound defender client</title>
+
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <style>
+    html {
+        height: 60%;
+    }
+    body {
+        height: 60%;
+    }
+    button {
+        position: absolute;
+        height: 30%;
+        width: 30%;
+        font-size: 25vh;
+        background-color: transparent;
+        border: 0px;
+    }
+    .up {
+        left: 10%;
+        top: 10%;
+    }
+    .down {
+        left: 10%;
+        bottom: 10%;
+    }
+    .shoot {
+        left: 60%;
+        top: 35%;
+        color: red;
+    }
+  </style>
+
+    <script src="/socket.io/socket.io.js"></script>
+  <script src="elem.js"></script>
+</head>
+  <body>
+        <button type="button" class="up fa fa-arrow-up"></button>
+        <button type="button" class="down fa fa-arrow-down"></button>
+        <button type="button" class="shoot fa fa-circle"></button>
+        <script>
+
+        var socket = io.connect('http://lacerta.be');
+        socket.on('connect', function () {
+            socket.emit("client");
+        })
+        socket.on("ok", function(data) {
+            document.getElem("body").style.backgroundColor = data.color;
+        });
+        socket.on("nok", function(data) {
+            document.getElem("body").innerHTML = '<div class="message">Too many clients</div>';
+        });
+        document.getElem("button.up").on("click", function() {
+            socket.emit("up");
+        });
+        document.getElem("button.down").on("click", function() {
+            socket.emit("down");
+        });
+        document.getElem("button.shoot").on("click", function() {
+            socket.emit("shoot");
+        });
+        </script>
+  </body>
+</html>

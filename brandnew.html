@@ -15,7 +15,7 @@
 	var player;
     var oomph=1000; // the beat threshold
     var energythreshold=1; // how much the previous point can differ from the next point
-    var volgraph=false; // set to true to create graph based on volume
+    var booms=false;
 
     var url = 'test.mp3';
     var graphType = 'loudness' // numba, loudness, level
@@ -229,30 +229,34 @@ function onFrame(event) {
             }
             level=soundArray[3]*5;
             averagevolume=(averagevolume+level)/2;
+
             if(level>oomph){
                 if(!prev){
                     newcol();
                     prev=true;
-                }else if(booming<=0){
-                	var quake=rnd(path.segments.length-60)+40;
-                	var low=(view.size.height-path.segments[quake].point.y)/4;
-                	path.segments[quake].point.y=view.size.height-low*3;
-                	path.segments[quake-1].point.y-=low;
-                	path.segments[quake-2].point.y-=low/2;
-                	path.segments[quake+1].point.y-=low;
-                	path.segments[quake+2].point.y-=low/2;
-                	booming=1;
-                	console.log("*****");
+                }else if(booms && booming<=0){
+                    var quake=rnd(path.segments.length-60)+40;
+                    var low=(view.size.height-path.segments[quake].point.y)/4;
+                    path.segments[quake].point.y=view.size.height-low*3;
+                    path.segments[quake-1].point.y-=low;
+                    path.segments[quake-2].point.y-=low/2;
+                    path.segments[quake+1].point.y-=low;
+                    path.segments[quake+2].point.y-=low/2;
+                    booming=1;
+                    console.log("*****");
                 }else{
-                	booming++;
+                    booming++;
                 }
                 oomph=level-(level-oomph)/4;
             }else{
-            	booming--;
+                booming--;
                 var tmp=oomph-averagevolume;
                 oomph=oomph-(tmp/100);
                 prev=false;
             }
+
+
+
             /*for ( var i = 0; i < (soundArray.length); i++ ){
                 var newnum=soundArray[i]*bins[lookup[i+1]];
                 if(newnum>varue){

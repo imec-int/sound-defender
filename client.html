@@ -69,11 +69,9 @@
     var down=document.getElem(".controller .down");
 
     var startControlPad = function(direction) {
-        document.getElem("."+direction).style.backgroundColor = '#F00';
         window['direction'] = direction;
     }
     var stopControlPad = function(direction) {
-        document.getElem("."+direction).style.backgroundColor = '#0F0';
         if (window['direction'] === direction) {
             window['direction'] = '';
         }
@@ -96,7 +94,7 @@
         if (direction) {
             socket.emit(direction);
         }
-    },500);
+    },100);
 
   </script>
 </head>

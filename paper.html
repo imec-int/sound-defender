@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="stylesheet" href="/assets/css/style.css"/>
+  <link rel="icon" href="/assets/favicon.ico" type="image/x-icon"/>
+  <link rel="shortcut icon" href="/assets/favicon.ico"/>
+  <script src="dist/paper.js"></script>
+  <title>Paper.js - Paper.js</title>
+</head>
+  <body class="fullscreen">
+
+<script type="text/paperscript" canvas="canvas-1">
+var width, height, center;
+var points = 64;
+var smooth = true;
+var path = new Path();
+// var mousePos = view.center / 2;
+var pathHeight = 0;
+path.fillColor = 'black';
+initializePath();
+
+function initializePath() {
+        center = view.center;
+        width = view.size.width;
+        height = view.size.height / 2;
+        path.segments = [];
+        path.add(view.bounds.bottomLeft);
+        for (var i = 1; i < points; i++) {
+                var point = new Point(width / points * i, center.y);
+                path.add(point);
+        }
+        path.add(view.bounds.bottomRight);
+        path.fullySelected = false;
+}
+
+
+    var soundArray;
+    var show=0;
+    function onFrame(event) {
+          if (soundArray) {
+
+            for ( var i = 0; i < (soundArray.length); i++ ){
+                var value = center.y*2 - soundArray[i];
+                //ctx.fillRect(i*1,325-value,1,325);
+
+                path.segments[i+1].point.y = value;
+            }
+
+
+
+            if (smooth)
+                    path.smooth();
+          }
+
+    }
+
+var context;
+var source;
+var analyser;
+var buffer;
+var audioBuffer;
+var javascriptNode;
+
+    function getUserMedia(dictionary, callback) {
+        navigator.webkitGetUserMedia(dictionary, callback, onError);
+    }
+
+    function gotStream(stream) {
+        s = stream;
+
+        initAudio(stream);
+    }
+
+    function initAudio(stream) {
+        context = new webkitAudioContext();
+        javascriptNode = context.createScriptProcessor(2048, 1, 1);
+        javascriptNode.connect(context.destination);
+        
+        analyser = context.createAnalyser();
+        analyser.fftSize = points*2;
+
+        // Connect audio processing graph:
+        // live-input -> analyser -> destination
+
+        // Create an AudioNode from the stream.
+        var mediaStreamSource = context.createMediaStreamSource(stream);    
+        mediaStreamSource.connect(analyser);
+        analyser.connect(context.destination);
+
+        javascriptNode.onaudioprocess = function() {
+            soundArray =  new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(soundArray);
+        }
+    }
+
+    function loadSound3() {
+        getUserMedia({audio:true}, gotStream);
+    }
+
+    function playSound(buffer) {
+        sourceNode.buffer = buffer;
+        sourceNode.start(0);
+    }
+
+    // log if an error occurs
+    function onError(e) {
+        console.log(e);
+    }
+
+   // setupAudioNodes();
+    loadSound3();
+  
+
+
+    if (! window.AudioContext) {
+        if (! window.webkitAudioContext) {
+            alert('no audiocontext found');
+        }
+        window.AudioContext = window.webkitAudioContext;
+    }
+
+</script>
+<div class="canvas">
+<canvas resize="true" id="canvas-1"></canvas>
+</div>
+</div></article>
+  </body>
+</html>

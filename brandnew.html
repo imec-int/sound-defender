@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="/assets/css/style.css"/>
+    <link rel="icon" href="/assets/favicon.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" href="/assets/favicon.ico"/>
+    <script src="dist/paper.js"></script>
+    <title>Paper.js - Paper.js</title>
+</head>
+<body class="fullscreen">
+<script type="text/javascript">
+	var path;
+	var eq;
+	var player;
+    var oomph=1000; // the beat threshold
+    var energythreshold=1; // how much the previous point can differ from the next point
+    var volgraph=false; // set to true to create graph based on volume
+
+    var graphType = 'loudness' // numba, loudness, level
+
+function newcol(){
+	var h=rnd(360),l=rnd(30);
+	document.body.style.backgroundColor="hsl("+h+",50%,"+(100-l)+"%)";
+	path.fillColor="hsl("+(h+180)+",50%,"+l+"%)";
+}
+var interval=setInterval(difficult,1000);
+function difficult(){
+	energythreshold++;
+	console.log(energythreshold);
+	if(energythreshold>100){
+		clearInterval(interval);
+	}
+}
+var keyup=false;
+function rnd(num){
+    return Math.floor(Math.random()*num);
+}
+    function getPrimes(max) {
+        var sieve = [], i, j, primes = [];
+        for (i = 2; i <= max; ++i) {
+            if (!sieve[i]) {
+                // i has not been marked -- it is prime
+                primes.push(i);
+                for (j = i << 1; j <= max; j += i) {
+                    sieve[j] = true;
+                }
+            }
+        }
+        return primes;
+    }
+    var primes=getPrimes(1024);
+    var lookup=[1,1];
+    for(var i=2;i<=1024;i++){
+        var num=i;
+        var tel=0;
+        var search=true;
+        while(search){
+            if(num%primes[tel]==0){
+                num=num/primes[tel];
+            }else if(primes[tel]<num){
+                tel++;
+            }else{
+                lookup[i]=tel==0?1:primes[tel];
+                search=false;
+            }
+        }
+    }
+</script>
+<script type="text/paperscript" canvas="canvas-1">
+var width, height, center;
+var points = 128;
+var smooth = false;
+var pathHeight = 0;
+var soundArray;
+var context;
+var source;
+var analyser;
+var buffer;
+var audioBuffer;
+var javascriptNode;
+
+eq = new Path();
+eq.fillColor = 'rgba(0,0,0,0.5)';
+path = new Path();
+path.fillColor = 'black';
+player=new Path.Circle({
+	radius:10,
+	strokeColor: 'black',
+	fillColor: 'orange',
+	center:{x:10*view.size.width/128, y:view.center.y-10}
+});
+initializePath();
+initializeEQ();
+function initializePath() {
+    center = view.center;
+    width = view.size.width;
+    height = view.size.height / 2;
+    path.segments = [];
+    path.add(view.bounds.bottomLeft);
+    for (var i = 0; i < points; i++) {
+        var point = new Point(width / points * i, center.y);
+        path.add(point);
+    }
+    path.add(new Point(width / points * i,view.size.height));
+    path.add(view.bounds.bottomRight);
+    path.fullySelected = false;
+}
+function initializeEQ() {
+    center = view.center;
+    width = view.size.width;
+    height = view.size.height / 2;
+    eq.segments = [];
+    eq.add(new Point(0,height*2));
+    //path.add(view.bounds.bottomLeft);
+    for (var i = 0; i < points; i++) {
+        var point = new Point(width / points * i, height);
+        eq.add(point);
+    }
+    eq.add(new Point(width / points * i,height));
+    eq.add(new Point(width / points * i,height*2));
+    eq.fullySelected = false;
+}
+function loadSound() {
+    navigator.webkitGetUserMedia({audio:true}, initAudio, onError);
+}
+function initAudio(stream) {
+    context = new webkitAudioContext();
+    javascriptNode = context.createScriptProcessor(256, 2, 1);
+    javascriptNode.connect(context.destination);
+    
+    analyser = context.createAnalyser();
+
+    // Connect audio processing graph:
+    // live-input -> analyser -> destination
+
+    // Create an AudioNode from the stream.
+    var mediaStreamSource = context.createMediaStreamSource(stream);    
+    mediaStreamSource.connect(analyser);
+    analyser.connect(context.destination);
+
+    javascriptNode.onaudioprocess = function() {
+        soundArray =  new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(soundArray);
+    }
+}
+// log if an error occurs
+function onError(e) {
+    console.log(e);
+}
+if (! window.AudioContext) {
+    if (! window.webkitAudioContext) {
+        alert('no audiocontext found');
+    }
+    window.AudioContext = window.webkitAudioContext;
+}
+loadSound();
+var prev=false;
+var restEnergy=0;
+var booming=0;
+var averagevolume=0;
+var velocity=0;
+var gravity=.9;
+function onKeyDown(event) {
+	if(Math.abs(player.position.y+10-path.segments[10].point.y)<10){
+		velocity=20;
+	}
+}
+
+var loudnessHistory = new Array(points);
+var beatHistory = new Array(points);
+var numbaHistory = new Array(points);
+
+function onFrame(event) {
+          if (soundArray) {
+            var varue=-1;
+            var numba=0;
+            //console.log(bandsize);
+            bins=[];
+            var highestbin=0;
+            var highestvalue=-1;
+            // pas vanaf waarde 3 gebruiken om de ruis te filteren
+            for ( var i = 3; i < 127/*(soundArray.length)*/; i++ ){
+                /*bins[lookup[i+1]]=(bins[lookup[i+1]]||0)+(soundArray[i]*lookup[i+1]/2);
+                if(bins[lookup[i+1]]>highestvalue){
+                    highestbin=lookup[i+1];
+                    highestvalue=bins[lookup[i+1]];
+                }*/
+                eq.segments[i+1].point.y=view.size.height-soundArray[i];
+                var vallie=soundArray[i];//*((i+1)/soundArray.length);
+                if(vallie>varue){
+                    varue=vallie;
+                    numba=i;
+                }
+
+            }
+            var level=0;
+            for(var i=0;i<5;i++){
+                level+=soundArray[5+i];
+            }
+            level=soundArray[3]*5;
+            averagevolume=(averagevolume+level)/2;
+            if(level>oomph){
+                if(!prev){
+                    newcol();
+                    prev=true;
+                }else if(booming<=0){
+                	var quake=rnd(path.segments.length-60)+40;
+                	var low=(view.size.height-path.segments[quake].point.y)/4;
+                	path.segments[quake].point.y=view.size.height-low*3;
+                	path.segments[quake-1].point.y-=low;
+                	path.segments[quake-2].point.y-=low/2;
+                	path.segments[quake+1].point.y-=low;
+                	path.segments[quake+2].point.y-=low/2;
+                	booming=1;
+                	console.log("*****");
+                }else{
+                	booming++;
+                }
+                oomph=level-(level-oomph)/4;
+            }else{
+            	booming--;
+                var tmp=oomph-averagevolume;
+                oomph=oomph-(tmp/100);
+                prev=false;
+            }
+            /*for ( var i = 0; i < (soundArray.length); i++ ){
+                var newnum=soundArray[i]*bins[lookup[i+1]];
+                if(newnum>varue){
+                    varue=newnum;
+                    numba=i;
+                }
+            }*/
+
+            loudnessHistory.shift();
+            beatHistory.shift();
+            numbaHistory.shift();
+
+            var loudness = 0
+            for (var i=0; i<soundArray.length; i++) { loudness += soundArray[i]; }
+
+            loudnessHistory.push(loudness);
+            beatHistory.push(level);
+            numbaHistory.push(numba);
+
+            var value = center.y*2 - numba*4;
+
+            if (graphType === 'level') value = center.y*2 - level/4;
+            else if (graphType === 'loudness') value = center.y*2 - loudness/400;
+
+            //value=center.y*2-(level/4);
+            // display beat plus beat threshold
+            path.segments[3].point.y=center.y*2-(level/4);
+            path.segments[4].point.y=center.y*2-(level/4);
+            path.segments[1].point.y=center.y*2-(oomph/4);
+            path.segments[2].point.y=center.y*2-(oomph/4);
+
+            //console.log(numba+":"+varue);
+            /*var teller=0;
+            for(var bi in bins){
+                teller++;
+                console.log(bi);
+                //console.log(teller);
+                path.segments[teller].point.y=view.size.height-(bins[bi]/100);
+            }*/
+
+            // scroll points
+            for ( var i = 5; i < (path.segments.length-2); i++ ){
+                path.segments[i].point.y = path.segments[i+1].point.y;
+            }
+            //path.segments[i].point.y=(path.segments[i-2].point.y+path.segments[i-1].point.y+value)/3;
+            var last=path.segments.length-2;
+            var energy=path.segments[last-1].point.y-(value+(restEnergy/2));
+            if(energy>energythreshold){
+            	//console.log(energy);
+            	restEnergy=(energy-energythreshold)/3;
+            	energy=energythreshold;
+            }else if(energy<(0-energythreshold)){
+            	//console.log(energy);
+            	restEnergy=(energy+energythreshold)/3;
+            	energy=-energythreshold;
+            }else{
+            	restEnergy=restEnergy/3;
+            }
+            path.segments[last].point.y=path.segments[last-1].point.y-energy;
+//path.segments[last].point.y=value;
+
+			player.position.y-=velocity;
+			if(player.position.y+10>path.segments[11].point.y){
+				velocity+=player.position.y+10-path.segments[11].point.y
+				player.position.y=path.segments[11].point.y-10;
+			}else{
+
+				if(player.position.y+10>path.segments[10].point.y){
+					player.position.y=path.segments[10].point.y-10;
+					if(velocity<0){
+						velocity=0;
+					}
+				}
+			}
+			velocity-=gravity;
+			eq.smooth();
+            if (smooth)
+                    path.smooth();
+          }
+
+    }
+
+
+
+
+</script>
+<div class="canvas">
+    <canvas resize="true" id="canvas-1"></canvas>
+</div>
+</div></article>
+</body>
+</html>

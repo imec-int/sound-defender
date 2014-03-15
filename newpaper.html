@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="stylesheet" href="/assets/css/style.css"/>
+  <link rel="icon" href="/assets/favicon.ico" type="image/x-icon"/>
+  <link rel="shortcut icon" href="/assets/favicon.ico"/>
+  <script src="dist/paper.js"></script>
+  <title>Paper.js - Paper.js</title>
+</head>
+  <body class="fullscreen">
+<script type="text/javascript">
+    var filter;
+    var analyser;
+    var bandsize;
+    var bins;
+    var oomph=1000;
+    function getPrimes(max) {
+        var sieve = [], i, j, primes = [];
+        for (i = 2; i <= max; ++i) {
+            if (!sieve[i]) {
+                // i has not been marked -- it is prime
+                primes.push(i);
+                for (j = i << 1; j <= max; j += i) {
+                    sieve[j] = true;
+                }
+            }
+        }
+        return primes;
+    }
+    var primes=getPrimes(1024);
+    var lookup=[1,1];
+    var path;
+    for(var i=2;i<=1024;i++){
+        var num=i;
+        var tel=0;
+        var search=true;
+        while(search){
+            if(num%primes[tel]==0){
+                num=num/primes[tel];
+            }else if(primes[tel]<num){
+                tel++;
+            }else{
+                lookup[i]=tel==0?1:primes[tel];
+                search=false;
+            }
+        }
+    }
+    function newcol(){
+        var h=rnd(360),s=rnd(100),l=rnd(100);
+document.body.style.backgroundColor="hsl("+h+","+s+"%,"+l+"%)";
+path.fillColor="hsl("+(360-h)+","+(100-s)+"%,"+(100-l)+"%)";
+    }
+    function rnd(num){
+        return Math.floor(Math.random()*num);
+    }
+</script>
+<script type="text/paperscript" canvas="canvas-1">
+var width, height, center;
+var points = 128;
+var smooth = false;
+path = new Path();
+// var mousePos = view.center / 2;
+var pathHeight = 0;
+path.fillColor = 'black';
+initializePath();
+
+function initializePath() {
+        center = view.center;
+        width = view.size.width;
+        height = view.size.height / 2;
+        path.segments = [];
+        path.add(view.bounds.bottomLeft);
+        for (var i = 0; i < points; i++) {
+                var point = new Point(width / points * i, center.y);
+                path.add(point);
+        }
+        path.add(new Point(width / points * i,view.size.height));
+        path.add(view.bounds.bottomRight);
+        path.fullySelected = false;
+}
+
+// function onResize(event) {
+//         initializePath();
+// }
+
+
+
+    if (! window.AudioContext) {
+        if (! window.webkitAudioContext) {
+            alert('no audiocontext found');
+        }
+        window.AudioContext = window.webkitAudioContext;
+    }
+
+
+    var context = new AudioContext();
+    var audioBuffer;
+    var audio;
+    var sourceNode;
+    var javascriptNode;
+
+    function setupAudioNodes() {
+
+        // setup a javascript node
+        javascriptNode = context.createScriptProcessor(256, 2, 1);
+        // connect to destination, else it isn't called
+        javascriptNode.connect(context.destination);
+
+
+        // setup a analyzer
+        analyser = context.createAnalyser();
+        analyser.smoothingTimeConstant = 0.5;
+        //analyser.fftSize = points*2;
+        //filter = context.createBiquadFilter();
+
+        audio = new Audio();
+        sourceNode = context.createMediaElementSource(audio);
+        //sourceNode.connect(analyser);
+        //sourceNode.connect(filter);
+        // create a buffer source node
+        //sourceNode = context.createBufferSource();
+        sourceNode.connect(analyser);
+        analyser.connect(javascriptNode);
+        bandsize=context.sampleRate/analyser.fftSize;
+        sourceNode.connect(context.destination);
+        /*filter.connect(context.destination);
+        filter.connect(analyser);
+        filter.type = 2;
+        filter.frequency.value = 440;
+        filter.Q.value=10;
+        filter.detune.value=1000;*/
+        /*filter.type=0;
+        filter.frequency.value=440;*/
+
+        console.log(filter);
+        javascriptNode.onaudioprocess = function() {
+
+            // get the average for the first channel
+            soundArray =  new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(soundArray);
+
+        }
+
+    }
+    //var bandsize=context.sampleRate/analyser.fftSize;
+    var soundArray;
+    var show=0;
+    var prev=false;
+    function onFrame(event) {
+          if (soundArray) {
+            var varue=-1;
+            var numba=0;
+            //console.log(bandsize);
+            bins=[];
+            var highestbin=0;
+            var highestvalue=-1;
+            for ( var i = 10; i < 100/*(soundArray.length)*/; i++ ){
+                /*bins[lookup[i+1]]=(bins[lookup[i+1]]||0)+(soundArray[i]*lookup[i+1]/2);
+                if(bins[lookup[i+1]]>highestvalue){
+                    highestbin=lookup[i+1];
+                    highestvalue=bins[lookup[i+1]];
+                }*/
+                var vallie=soundArray[i];//*((i+1)/soundArray.length);
+                if(vallie>varue){
+                    varue=vallie;
+                    numba=i;
+                }
+                
+                //var value = center.y*2 - (soundArray[i]*2);
+                //if(value<varue)varue=value;
+            }
+            var level=0;
+            for(var i=0;i<5;i++){
+                level+=soundArray[1+i];
+            }
+            level=soundArray[1]*5;
+            if(level>oomph){
+                if(!prev){
+                    newcol();
+                    prev=true;
+                }
+                oomph=level-(level-oomph)/4;
+            }else{
+                var tmp=oomph-level;
+                oomph=oomph-.5;
+                prev=false;
+            }
+            for ( var i = 0; i < (soundArray.length); i++ ){
+                var newnum=soundArray[i]*bins[lookup[i+1]];
+                if(newnum>varue){
+                    varue=newnum;
+                    numba=i;
+                }
+            }
+            var value=center.y*2 - (numba*4);
+            path.segments[3].point.y=center.y*2-(level/4);
+            path.segments[4].point.y=center.y*2-(level/4);
+            path.segments[1].point.y=center.y*2-(oomph/4);
+            path.segments[2].point.y=center.y*2-(oomph/4);
+            //console.log(numba+":"+varue);
+            /*var teller=0;
+            for(var bi in bins){
+                teller++;
+                console.log(bi);
+                //console.log(teller);
+                path.segments[teller].point.y=view.size.height-(bins[bi]/100);
+            }*/
+            for ( var i = 5; i < (path.segments.length-2); i++ ){
+                //ctx.fillRect(i*1,325-value,1,325);
+
+                path.segments[i].point.y = path.segments[i+1].point.y;
+                //  console.log([i,value])
+
+            }
+            path.segments[i].point.y=(path.segments[i-2].point.y+path.segments[i-1].point.y+value)/3;
+            //path.segments[i].point.y=value;
+
+                if (show++ % 100 == 0) {
+                  //console.log(soundArray);
+                  //console.log(path);
+                  //console.log(path.segments[0].point.y);
+                }
+
+            if (smooth)
+                    path.smooth();
+          }
+
+    }
+
+    function loadSound(url) {
+        var request = new XMLHttpRequest();
+        request.open('GET', url, true);
+        request.responseType = 'arraybuffer';
+
+        // When loaded decode the data
+        request.onload = function() {
+
+            // decode the data
+            context.decodeAudioData(request.response, function(buffer) {
+                // when the audio is decoded play the sound
+                playSound(buffer);
+            }, onError);
+        }
+        request.send();
+    }
+
+    function loadSound2(url) {
+        audio.src = url;
+
+        audio.addEventListener('canplaythrough', function() {
+          audio.play();
+        }, false);
+    }
+
+    function playSound(buffer) {
+        sourceNode.buffer = buffer;
+        sourceNode.start(0);
+    }
+
+    // log if an error occurs
+    function onError(e) {
+        console.log(e);
+    }
+
+    setupAudioNodes();
+    loadSound2("test.mp3");
+  
+
+</script>
+<div class="canvas">
+<canvas resize="true" id="canvas-1"></canvas>
+</div>
+</div></article>
+  </body>
+</html>

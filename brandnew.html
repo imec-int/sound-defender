@@ -34,6 +34,7 @@
         shoot(data.player);
     });
     socket.on('live',function(data){
+	console.log("live: "+data.player);
         live(data.player);
     })
   });
@@ -51,6 +52,7 @@
     }
   }
   function live(player){
+	console.log(playcollection[player]);
     players[player].live=true;
     players[player].score=0;
     playcollection[player].opacity = 1;

@@ -77,7 +77,21 @@
         position: absolute;
         width: 100%;
         text-align: center;
-
+        bottom: 2em;
+        font-size: 2em;
+    }
+    .loser .share label {
+        text-shadow:2px 2px #000000;
+        font-weight: bold;
+        color: #FAFAFA;
+    }
+    .loser .share button {
+        border: 1px solid #222022;
+        background-color: #FAFAFA;
+        font-size: 1em;
+        font-weight: normal;
+        border-radius: 5px;
+        color: #222022;
     }
   </style>
 
@@ -148,17 +162,26 @@
     document.getElemAll(".controller, .loser").forEach(function(elem) {
         elem.on("touchend", function(event) { event.preventDefault(); })
     });
+
+    document.getElem(".loser .twitter").on("click", tweet);
+    document.getElem(".loser .twitter").on("touchstart", tweet);
+
   });
 
-    setInterval(function(){
-        if (direction) {
-            socket.emit(direction);
-        }
-    },100);
-
+    function tweet() {
+        var url = "https://twitter.com/intent/tweet?text=";
+        url += encodeURIComponent(this.getAttribute("data-prefilltext"));
+        window.open(url);
+    }
+   setInterval(function(){
+        if (direction) socket.emit(direction);
+   },100);
   </script>
 </head>
   <body>
+<!--     <div class="connecting">
+        <div class="text">Connecting...</div>
+    </div> -->
     <div class="controller">
         <div class="kabeltje"></div>
         <div class="up"></div>
@@ -168,14 +191,10 @@
     </div>
     <div class="loser">
         <div class="share">
-            <label>Share this on: </label>
-            <button type="button" class="twitter">
+            <label>Share on: </label>
+            <button type="button" class="twitter" data-prefilltext="Just played sound defender vs @CDDofficial at @ABconcerts">
                 <span class="fa fa-twitter"></span>
                 Twitter
-            </button>
-            <button type="button" class="googleplus">
-                <span class="fa fa-google-plus"></span>
-                Google+
             </button>
         </div>
     </div>

@@ -24,7 +24,7 @@
     });
   });
   function kill(player){
-    socket.emit("kill",{player:player});
+    socket.emit("kill",{player:player,score:players[player].score});
   }
 </script>
 <script type="text/javascript">
@@ -34,7 +34,7 @@
         app.onNoteOn(function(note, velocity, channel){
             if(velocity>10){
 
-                var height=note%12;
+                var height=11-(note%12);
                 var bottom= path.segments[127].point.y;
                 evildoers.push({y:bottom/11*height});
             }
@@ -491,6 +491,22 @@ function onFrame(event) {
                             players[i].bullets[j].currentpixel=-100;
                             bulletpoints[i+(j*5)].position.y=-100;
                             bulletpoints[i+(j*5)].position.x=-100;
+                        }else{
+                            for(var k=0;k<evildoers.length;k++){
+                                var e=evildoers[k];
+                                if(typeof e.y=="undefined"){
+                                    var b=bulletpoints[i+(j*5)];
+                                    if(b.position.x>e.position.x-20 && b.position.x<e.position.x+20 && b.position.y>e.position.y-10 && b.position.y<e.position.y+10){
+                                        e.remove();
+                                        evildoers.splice(k,1);
+                                        players[i].bullets[j].active=false;
+                                        players[i].bullets[j].currentpixel=-100;
+                                        players[i].score=(players[i].score||0)+10;
+                                        bulletpoints[i+(j*5)].position.y=-100;
+                                        bulletpoints[i+(j*5)].position.x=-100;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -525,6 +541,21 @@ function onFrame(event) {
                     e.remove();
                     evildoers.splice(i,1);
                     i--;
+                }else{
+                    for(var j=0;j<5;j++){
+                        var p=playcollection[j];
+                        if(p.position.x>e.position.x-20 && p.position.x<e.position.x+20 && p.position.y>e.position.y-20 && p.position.y<e.position.y+20){
+                            players[j].currentpixel=0;
+                            players[j].currentHeight=0;
+                            players[j].target=0;
+                            p.position.y=0;
+                            kill(j);
+                            e.remove();
+                            evildoers.splice(i,1);
+                            i--;
+
+                        }
+                    }
                 }
             }
           }

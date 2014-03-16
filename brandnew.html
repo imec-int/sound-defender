@@ -41,7 +41,7 @@
   function kill(player){
     if(players[player].live){
         playcollection[player].opacity = 0;
-        socket.emit("kill",{player:player,score:(players[player].score||0)});
+        socket.emit("kill",{player:player,score:players[player].score});
         players[player].score=0;
         players[player].live=false;
         for(var i=0;i<5;i++){
@@ -60,7 +60,7 @@
   }
 </script>
 <script type="text/javascript">
-    var invulnerabletime=20;
+    var invulnerabletime=200;
     var evildoers=[];
     var app = new MixApi();
     app.init(function(){

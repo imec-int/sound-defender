@@ -24,7 +24,7 @@
     });
   });
   function kill(player){
-    socket.emit("kill",{player:player,score:players[player].score});
+    socket.emit("kill",{player:player,score:(players[player].score||0)});
   }
 </script>
 <script type="text/javascript">

@@ -50,10 +50,10 @@
     app.init(function(){
         app.onNoteOn(function(note, velocity, channel){
             if(velocity>10){
-
-                var height=11-(note%12);
-                var bottom= path.segments[127].point.y;
-                evildoers.push({y:bottom/11*height});
+                evildoers.push({
+                    note: note%12,
+                    channel: channel
+                });
             }
         });
     });
@@ -69,7 +69,21 @@
     var viewding=0;
     var url = 'test.mp3';
     var graphType = 'loudness' // numba, loudness, level
-var colors=["#FF00FF","#FFFF00","#00FF00","#00FFFF","#0000FF"];
+    var colors=["#FF00FF","#FFFF00","#00FF00","#00FFFF","#0000FF"];
+    var playerImages=["img/0000FF.png","img/00FF00.png","img/00FFFF.png","img/FF00FF.png","img/FFFF00.png"]
+    var pbjtImages=[
+        'img/pbjt0.png',
+        'img/pbjt1.png',
+        'img/pbjt2.png',
+        'img/pbjt3.png',
+        'img/pbjt4.png',
+        'img/pbjt5.png',
+        'img/pbjt6.png',
+        'img/pbjt7.png',
+    ]
+    var pbjtIndex = 0;
+    var scale=0.5;
+
 function newcol(){
 	var h=rnd(360),l=rnd(30);
 	document.body.style.backgroundColor="hsl("+h+",50%,"+(100-l)+"%)";
@@ -206,7 +220,11 @@ path = new Path();
 path.fillColor = 'black';
 playcollection=[];
 for(var i=0;i<5;i++){
-    var p = new Raster('player_'+(i+1));
+    var p = new Raster({
+        source: playerImages[i],
+        position: {x:(7+(i*7))*view.size.width/128,y:view.center.y-10}
+    });
+    if (scale) p.scale(scale);
     playcollection[i]=p;
 }
 viewding=view.size.width;
@@ -352,6 +370,7 @@ function onKeyUp(event){
 var loudnessHistory = new Array(points);
 var beatHistory = new Array(points);
 var numbaHistory = new Array(points);
+var printed=0;
 function onFrame(event) {
           if (soundArray) {
             var varue=-1;
@@ -506,8 +525,10 @@ function onFrame(event) {
                         }else{
                             for(var k=0;k<evildoers.length;k++){
                                 var e=evildoers[k];
-                                if(typeof e.y=="undefined"){
+                                if(typeof e.note=="undefined"){
                                     var b=bulletpoints[i+(j*5)];
+                                    if (!b.position) console.log("'t is b");
+                                    if (!e.position) console.log("'t is e");
                                     if(b.position.x>e.position.x-20 && b.position.x<e.position.x+20 && b.position.y>e.position.y-10 && b.position.y<e.position.y+10){
                                         e.remove();
                                         evildoers.splice(k,1);
@@ -516,6 +537,7 @@ function onFrame(event) {
                                         players[i].score=(players[i].score||0)+10;
                                         bulletpoints[i+(j*5)].position.y=-100;
                                         bulletpoints[i+(j*5)].position.x=-100;
+                                        break;
                                     }
                                 }
                             }
@@ -537,41 +559,72 @@ function onFrame(event) {
                     path.smooth();
           }
           for(var i=0;i<evildoers.length;i++){
-            var e=evildoers[i];
-            if(typeof e.y !=='undefined'){
-                var n=new Path.Circle({
-                    radius:10,
-                    strokeColor:'black',
-                    fillColor:'red',
-                    center:{x:path.segments[127].point.x,y:e.y}
-                });
-                evildoers.splice(i,1,n);
-       
-            }else{
-                e.position.x-=view.size.width / points;
-                if(e.position.x<0){
-                    e.remove();
-                    evildoers.splice(i,1);
-                    i--;
+                var e=evildoers[i];
+                if(typeof e.note !=='undefined'){
+                    var n=createEnemy(e.note, e.channel);
+                    evildoers.splice(i,1,n);
+           
                 }else{
-                    for(var j=0;j<5;j++){
-                        var p=playcollection[j];
-                        if(isHit(p,e)){
-                            players[j].currentpixel=0;
-                            players[j].currentHeight=0;
-                            players[j].target=0;
-                            p.position.y=0;
-                            kill(j);
-                            e.remove();
-                            evildoers.splice(i,1);
-                            i--;
-                            break;
+                    e.position.x-=view.size.width / points;
+                    if(e.position.x<0){
+                        e.remove();
+                        evildoers.splice(i,1);
+                        i--;
+                    }else{
+                        for(var j=0;j<5;j++){
+                            var p=playcollection[j];
+                            if(isHit(p,e)){
+                                players[j].currentpixel=0;
+                                players[j].currentHeight=0;
+                                players[j].target=0;
+                                p.position.y=0;
+                                kill(j);
+                                e.remove();
+                                evildoers.splice(i,1);
+                                i--;
+                                break;
+                            }
                         }
                     }
+
+                    if (event.count%6==0 && e.pbjt) {
+                        e.image = document.getElementById('pbjt_'+pbjtIndex);
+                    }
                 }
-            }
           }
 
+          if (event.count%6==0) {
+              pbjtIndex++;
+              if (pbjtIndex >= 8) pbjtIndex = 0;
+          }
+    }
+
+    function createEnemy(note, channel) {
+        var enemyImages = [
+            'img/cdd1.png',
+            'img/cdd3.png',
+            'img/cdd2.png'
+        ]
+        var enemy;
+
+        var bottom= path.segments[127].point.y - 20;
+        var yPos=20 + bottom/11*(11-note);
+
+        if (note === 0) {
+            enemy = new Raster({
+                image: document.getElementById('pbjt_'+pbjtIndex),
+                position: {x:path.segments[127].point.x,y:yPos}
+            }); 
+            enemy.pbjt = true;
+            if (scale) enemy.scale(scale);
+        } else {
+            enemy = new Raster({
+                source: enemyImages[ channel%3 ],
+                position: {x:path.segments[127].point.x,y:yPos}
+            }); 
+            if (scale) enemy.scale(scale);
+        }
+        return enemy;
     }
 
     function isHit(player, enemy) {
@@ -588,15 +641,15 @@ function onFrame(event) {
 <div class="canvas">
     <canvas resize="true" id="canvas-1"></canvas>
 </div>
-
-<div class="rasters">
-    <img id="player_1" src="img/0000FF.png"/>
-    <img id="player_2" src="img/00FF00.png"/>
-    <img id="player_3" src="img/00FFFF.png"/>
-    <img id="player_4" src="img/FF00FF.png"/>
-    <img id="player_5" src="img/FFFF00.png"/>
+<div>
+    <img src="img/pbjt0.png" id="pbjt_0"/>
+    <img src="img/pbjt1.png" id="pbjt_1"/>
+    <img src="img/pbjt2.png" id="pbjt_2"/>
+    <img src="img/pbjt3.png" id="pbjt_3"/>
+    <img src="img/pbjt4.png" id="pbjt_4"/>
+    <img src="img/pbjt5.png" id="pbjt_5"/>
+    <img src="img/pbjt6.png" id="pbjt_6"/>
+    <img src="img/pbjt7.png" id="pbjt_7"/>
 </div>
-
-
 </body>
 </html>

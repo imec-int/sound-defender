@@ -203,7 +203,7 @@ function shoot(playernr){
         if(!players[playernr].bullets[i].active){
             players[playernr].bullets[i].active=true;
             players[playernr].bullets[i].y=players[playernr].currentpixel;
-            players[playernr].bullets[i].currentpixel=(players[playernr].xpos+1)*viewding/128;
+            players[playernr].bullets[i].currentpixel=playcollection[player].position.x;
             break;
         }
     }    
@@ -525,7 +525,7 @@ function onFrame(event) {
             for(var i=0;i<5;i++){
                 var p=playcollection[i];
                 p.position.y=players[i].currentpixel;
-                if(p.position.y+10>path.segments[10+(i*3)].point.y){
+                if(p.position.y+10>path.segments[7+(i*7)].point.y){
                     players[i].currentpixel=0;
                     players[i].currentHeight=0;
                     players[i].target=0;

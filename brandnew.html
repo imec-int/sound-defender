@@ -55,10 +55,12 @@
 	console.log(playcollection[player]);
     players[player].live=true;
     players[player].score=0;
-    playcollection[player].opacity = 1;
+    playcollection[player].opacity = 0.5;
+    playcollection[player].invulnerabletime=invulnerabletime;
   }
 </script>
 <script type="text/javascript">
+    var invulnerabletime=20;
     var evildoers=[];
     var app = new MixApi();
     app.init(function(){
@@ -524,6 +526,12 @@ function onFrame(event) {
 			}*/
             for(var i=0;i<5;i++){
                 var p=playcollection[i];
+                if(p.invulnerabletime>0){
+                    p.invulnerabletime--;
+                    if(p.invulnerabletime==0){
+                        p.opacity=1;
+                    }
+                }
                 p.position.y=players[i].currentpixel;
                 if(p.position.y+10>path.segments[7+(i*7)].point.y){
                     createExplosion(p.position);
@@ -683,7 +691,7 @@ function onFrame(event) {
     function isHit(player, enemy) {
         var heightOffset = player.height/2;
         return (
-            player.opacity != 0 &&
+            player.opacity === 1 &&
             player.position.x>enemy.position.x-20 && 
             player.position.x<enemy.position.x+20 && 
             player.position.y>enemy.position.y-heightOffset && 

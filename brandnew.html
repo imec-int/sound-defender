@@ -34,9 +34,9 @@
         app.onNoteOn(function(note, velocity, channel){
             if(velocity>10){
 
-                var height=(note%13)+1;
+                var height=note%12;
                 var bottom= path.segments[127].point.y;
-                evildoers.push({y:bottom/13*height});
+                evildoers.push({y:bottom/11*height});
             }
         });
     });
@@ -520,7 +520,12 @@ function onFrame(event) {
                 evildoers.splice(i,1,n);
        
             }else{
-                e.position.x-=view.size.width / points
+                e.position.x-=view.size.width / points;
+                if(e.position.x<0){
+                    e.remove();
+                    evildoers.splice(i,1);
+                    i--;
+                }
             }
           }
 

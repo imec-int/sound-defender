@@ -7,6 +7,17 @@
     <script type="text/javascript" src="jquery-min.js"></script>
     <script src="http://mixmini.mixlab.be:3000/javascripts/api.js" type='text/javascript'></script>
     <title>Paper.js - Paper.js</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: url('img/back2.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+    </style>
 </head>
 <body style="overflow:hidden">
 <script>
@@ -28,7 +39,7 @@
   });
   function kill(player){
     if(players[player].live){
-        
+        playcollection[player].opacity = 0;
         socket.emit("kill",{player:player,score:(players[player].score||0)});
         players[player].score=0;
         players[player].live=false;
@@ -42,6 +53,7 @@
   function live(player){
     players[player].live=true;
     players[player].score=0;
+    playcollection[player].opacity = 1;
   }
 </script>
 <script type="text/javascript">
@@ -215,7 +227,7 @@ for(var i=0;i<5*bulletcount;i++){
     });
 }
 eq = new Path();
-eq.fillColor = 'rgba(0,0,0,0.5)';
+eq.fillColor = 'rgba(255,255,255,0.5)';
 path = new Path();
 path.fillColor = 'black';
 playcollection=[];
@@ -341,7 +353,7 @@ var height = view.size.height;
 step = height/20;
     players=[];
 for(var i=0;i<5;i++){
-    var player={xpos:10+(i*3),currentHeight:5,currentpixel:5*step,target:5,direction:0,live:false,score:0};
+    var player={xpos:10+(i*3),currentHeight:5,currentpixel:5*step,target:5,direction:0,live:true,score:0};
     var bullets=[];
     for(var j=0;j<bulletcount;j++){
         bullets[j]={active:false,currentpixel:-100,y:-100};
@@ -380,7 +392,7 @@ function onFrame(event) {
             var highestbin=0;
             var highestvalue=-1;
             // pas vanaf waarde 3 gebruiken om de ruis te filteren
-            for ( var i = 3; i < 127/*(soundArray.length)*/; i++ ){
+            for ( var i = 0; i < eq.segments.length-2/*(soundArray.length)*/; i++ ){
                 /*bins[lookup[i+1]]=(bins[lookup[i+1]]||0)+(soundArray[i]*lookup[i+1]/2);
                 if(bins[lookup[i+1]]>highestvalue){
                     highestbin=lookup[i+1];
@@ -454,10 +466,10 @@ function onFrame(event) {
 
             //value=center.y*2-(level/4);
             // display beat plus beat threshold
-            path.segments[3].point.y=center.y*2-(level/4);
-            path.segments[4].point.y=center.y*2-(level/4);
-            path.segments[1].point.y=center.y*2-(oomph/4);
-            path.segments[2].point.y=center.y*2-(oomph/4);
+            // path.segments[3].point.y=center.y*2-(level/4);
+            // path.segments[4].point.y=center.y*2-(level/4);
+            // path.segments[1].point.y=center.y*2-(oomph/4);
+            // path.segments[2].point.y=center.y*2-(oomph/4);
 
             //console.log(numba+":"+varue);
             /*var teller=0;
@@ -469,7 +481,7 @@ function onFrame(event) {
             }*/
 
             // scroll points
-            for ( var i = 5; i < (path.segments.length-2); i++ ){
+            for ( var i = 1; i < (path.segments.length-2); i++ ){
                 path.segments[i].point.y = path.segments[i+1].point.y;
             }
             //path.segments[i].point.y=(path.segments[i-2].point.y+path.segments[i-1].point.y+value)/3;
@@ -579,6 +591,7 @@ function onFrame(event) {
                                 players[j].target=0;
                                 p.position.y=0;
                                 kill(j);
+                                createExplosion(e.position);
                                 e.remove();
                                 evildoers.splice(i,1);
                                 i--;
@@ -597,7 +610,38 @@ function onFrame(event) {
               pbjtIndex++;
               if (pbjtIndex >= 8) pbjtIndex = 0;
           }
+
+
+          for (var i=0; i<explosions.length; i++) {
+                explosions[i].position.x += explosions[i].xadd;
+                explosions[i].position.y += explosions[i].yadd;
+                explosions[i].ttl--;
+                if (explosions[i].ttl <= 0) {
+                    explosions[i].remove();
+                    explosions.splice(i,1);
+                    i--;
+                }
+          }
     }
+
+
+    var explosions = [];
+
+    function createExplosion(position) {
+        for (var i=0; i<30; i++) {
+             var explosionPath=new Path.Circle({
+                 radius:2,
+                 strokeColor:'white',
+                 fillColor:'yellow',
+                 center:position
+             });
+             explosionPath.ttl = 50;
+             explosionPath.xadd = Math.round(Math.random()*10-5);
+             explosionPath.yadd = Math.round(Math.random()*10-5);
+             explosions.push(explosionPath);
+        }
+    }
+
 
     function createEnemy(note, channel) {
         var enemyImages = [
@@ -630,6 +674,7 @@ function onFrame(event) {
     function isHit(player, enemy) {
         var heightOffset = player.height/2;
         return (
+            player.opacity != 0 &&
             player.position.x>enemy.position.x-20 && 
             player.position.x<enemy.position.x+20 && 
             player.position.y>enemy.position.y-heightOffset && 

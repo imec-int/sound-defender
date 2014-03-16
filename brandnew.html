@@ -201,7 +201,7 @@ function shoot(playernr){
         if(!players[playernr].bullets[i].active){
             players[playernr].bullets[i].active=true;
             players[playernr].bullets[i].y=players[playernr].currentpixel;
-            players[playernr].bullets[i].currentpixel=playcollection[player].position.x;
+            players[playernr].bullets[i].currentpixel= playcollection[playernr].position.x;
             break;
         }
     }    

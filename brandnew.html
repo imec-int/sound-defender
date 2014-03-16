@@ -78,7 +78,7 @@
 	var eq;
 	var player;
     var oomph=1000; // the beat threshold
-    var energythreshold=1; // how much the previous point can differ from the next point
+    var energythreshold=100; // how much the previous point can differ from the next point
     var booms=false;
     var viewding=0;
     var url = 'test.mp3';
@@ -104,13 +104,13 @@ function newcol(){
 	document.body.style.backgroundColor="hsl("+h+",50%,"+(100-l)+"%)";
 	path.fillColor="hsl("+(h+180)+",50%,"+l+"%)";
 }
-var interval=setInterval(difficult,1000);
+/*var interval=setInterval(difficult,1000);
 function difficult(){
 	energythreshold++;
 	if(energythreshold>100){
 		clearInterval(interval);
 	}
-}
+}*/
 var keyup=false;
 function rnd(num){
     return Math.floor(Math.random()*num);
@@ -263,7 +263,7 @@ function initializePath() {
     path.segments = [];
     path.add(view.bounds.bottomLeft);
     for (var i = 0; i < points; i++) {
-        var point = new Point(width / points * i, center.y);
+        var point = new Point(width / points * i, center.y*2);
         path.add(point);
     }
     path.add(new Point(width / points * i,view.size.height));

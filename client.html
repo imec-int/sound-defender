@@ -77,7 +77,7 @@
         position: absolute;
         width: 100%;
         text-align: center;
-        bottom: 2em;
+        bottom: .5em;
         font-size: 2em;
     }
     .loser .share label {
@@ -93,6 +93,16 @@
         border-radius: 5px;
         color: #222022;
     }
+    .loser .score {
+        width: 100%;
+        text-align: center;
+        text-shadow:2px 2px #000000;
+        font-weight: bold;
+        color: #FAFAFA;
+        font-size: 3em;
+        position: relative;
+        top: 1em;
+    }
   </style>
 
   <script src="http://lacerta.be/socket.io/socket.io.js"></script>
@@ -106,6 +116,9 @@
      document.getElem("body").style.backgroundColor = data.color;
   })
   socket.on('dead', function(data) {
+    document.getElem(".theScore").setText(data.score);
+    document.getElem(".share .twitter").attrib("data-prefilltext", 
+        "Just scored "+data.score+" points playing sound defender vs @CDDofficial at @ABconcerts");
      document.getElem("body").style.backgroundColor = 'transparent';
      document.getElem(".loser").style.display = 'block';
      socket.disconnect();
@@ -190,6 +203,9 @@
         <div class="start"></div>
     </div>
     <div class="loser">
+        <div class="score">
+            Your score: <span class="theScore"></span>
+        </div>
         <div class="share">
             <label>Share on: </label>
             <button type="button" class="twitter" data-prefilltext="Just played sound defender vs @CDDofficial at @ABconcerts">

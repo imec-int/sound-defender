@@ -92,7 +92,9 @@
      document.getElem("body").style.backgroundColor = data.color;
   })
   socket.on('dead', function(data) {
-     document.getElem("body").style.backgroundColor = data.color;
+     document.getElem("body").style.backgroundColor = 'transparent';
+     document.getElem(".loser").style.display = 'block';
+     socket.disconnect();
   })
 
   var direction = '';
@@ -140,12 +142,12 @@
         socket.emit("shoot");
     });
 
-    document.getElem(".controller").on("touchstart", function(event) {
-         event.preventDefault();
-    })
-    document.getElem(".controller").on("touchend", function(event) {
-         event.preventDefault();
-    })
+    document.getElemAll(".controller, .loser").forEach(function(elem) {
+        elem.on("touchstart", function(event) { event.preventDefault(); })
+    });
+    document.getElemAll(".controller, .loser").forEach(function(elem) {
+        elem.on("touchend", function(event) { event.preventDefault(); })
+    });
   });
 
     setInterval(function(){

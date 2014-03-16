@@ -219,12 +219,17 @@ var buffer;
 var audioBuffer;
 var javascriptNode;
 for(var i=0;i<5*bulletcount;i++){
-    bulletpoints[i]=new Path.Circle({
-        radius:8,
-        strokeColor:'black',
-        fillColor:'white',
+    // bulletpoints[i]=new Path.Circle({
+    //     radius:8,
+    //     strokeColor:'black',
+    //     fillColor:'white',
+    //     center:{x:-100,y:-100}
+    // });
+    bulletpoints[i] = new Raster({
+        image: document.getElementById('shoot'),
         center:{x:-100,y:-100}
-    });
+    }); 
+    if (scale) bulletpoints[i].scale(scale);
 }
 eq = new Path();
 eq.fillColor = 'rgba(255,255,255,0.5)';
@@ -695,6 +700,7 @@ function onFrame(event) {
     <img src="img/pbjt5.png" id="pbjt_5"/>
     <img src="img/pbjt6.png" id="pbjt_6"/>
     <img src="img/pbjt7.png" id="pbjt_7"/>
+    <img src="img/shoot.png" id="shoot"/>
 </div>
 </body>
 </html>

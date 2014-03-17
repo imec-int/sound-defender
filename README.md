@@ -8,8 +8,11 @@ Installation
 =======
 
 1. Install the backend server from https://github.com/myster0n/sound-defender-backend
+
+```
   npm install
   nodejs index.js
+```
 
 2. Check out these static files and put them on a web server
 

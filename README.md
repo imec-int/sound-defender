@@ -8,13 +8,17 @@ Installation
 =======
 
 1. Install the backend server from https://github.com/myster0n/sound-defender-backend
-
 ```
+  git clone https://github.com/myster0n/sound-defender-backend.git
+  cd sound-defender-backend
   npm install
   nodejs index.js
 ```
 
 2. Check out these static files and put them on a web server
+```
+  git clone https://github.com/LennartC/sound-defender.git
+```
 
 3. open host.html and index.html in a text editor, and change the location of socket.io:
 

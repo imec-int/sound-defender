@@ -17,7 +17,7 @@ Installation
 
   <pre>
   ...
-  &lt;sript src="http://lacerta.be/socket.io/socket.io.js"&gt;&lt;/script&gt;
+  &lt;script src="http://lacerta.be/socket.io/socket.io.js"&gt;&lt;/script&gt;
   ...
   var socket = io.connect('http://lacerta.be');
   </pre>

@@ -7,7 +7,7 @@ and where the planes are controlled remotely with a smartphone or tablet.
 Installation
 =======
 
-1. Install the backend server from https://github.com/myster0n/sound-defender-backend
+* Install the backend server from https://github.com/myster0n/sound-defender-backend
 ```
   git clone https://github.com/myster0n/sound-defender-backend.git
   cd sound-defender-backend
@@ -15,12 +15,12 @@ Installation
   nodejs index.js
 ```
 
-2. Check out these static files and put them on a web server
+* Check out these static files and put them on a web server
 ```
   git clone https://github.com/LennartC/sound-defender.git
 ```
 
-3. open host.html and index.html in a text editor, and change the location of socket.io:
+* open host.html and index.html in a text editor, and change the location of socket.io:
 
   <pre>
   ...
@@ -29,12 +29,12 @@ Installation
   var socket = io.connect('http://lacerta.be');
   </pre>
 
-4. In host.html, change the location of the MIDI api:
+* In host.html, change the location of the MIDI api:
 
   <pre>
   &lt;script src="http://mixmini.mixlab.be:3000/javascripts/api.js" type='text/javascript'&gt;&lt;/script&gt;
   <pre>
 
-4. Plug in the audio cable on your desktop pc, open your desktop browser and go to http://your_web_server/sound-defender/host.html
+* Plug in the audio cable on your desktop pc, open your desktop browser and go to http://your_web_server/sound-defender/host.html
 
-5. With your smartphone, go to http://your_web_server/sound-defender/ and if a plane is assigned to you, start playing! 
+* With your smartphone, go to http://your_web_server/sound-defender/ and if a plane is assigned to you, start playing! 

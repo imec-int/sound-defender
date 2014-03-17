@@ -17,7 +17,7 @@ Installation
 
   <pre>
   ...
-  &gt;sript src="http://lacerta.be/socket.io/socket.io.js"&lt;&gt;/script&lt;
+  &lt;sript src="http://lacerta.be/socket.io/socket.io.js"&gt;&lt;/script&gt;
   ...
   var socket = io.connect('http://lacerta.be');
   </pre>
@@ -25,7 +25,7 @@ Installation
 4. In host.html, change the location of the MIDI api:
 
   <pre>
-  &gt;script src="http://mixmini.mixlab.be:3000/javascripts/api.js" type='text/javascript'&lt;&gt;/script&lt;
+  &lt;script src="http://mixmini.mixlab.be:3000/javascripts/api.js" type='text/javascript'&gt;&lt;/script&gt;
   <pre>
 
 4. Plug in the audio cable on your desktop pc, open your desktop browser and go to http://your_web_server/sound-defender/host.html

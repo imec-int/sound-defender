@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8"/>
     <script src="dist/paper.js"></script>
-    <script src="http://lacerta.be/socket.io/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="jquery-min.js"></script>
     <script src="http://mixmini.mixlab.be:3000/javascripts/api.js" type='text/javascript'></script>
-    <title>Paper.js - Paper.js</title>
+    <title>Sound Defender</title>
     <style>
         html, body {
             margin: 0;
@@ -21,7 +21,7 @@
 </head>
 <body style="overflow:hidden">
 <script>
-  var socket = io.connect('http://lacerta.be');
+  var socket = io.connect(window.location.hostname);
   socket.on('news', function (data) {
     socket.emit('host');
     socket.on('down',function(data){
@@ -176,7 +176,7 @@ function movePlayers(){
             if(bullet.active){
                 bullet.currentpixel+=bulletspeed;
             }
-        }   
+        }
     }
 }
 function changeHeight(playernr,height){
@@ -187,7 +187,7 @@ function changeHeight(playernr,height){
         players[playernr].target=players[playernr].target+height;
 
     }else{
-        players[playernr].target=players[playernr].currentHeight+height;    
+        players[playernr].target=players[playernr].currentHeight+height;
     }
     players[playernr].direction=height;
     if(players[playernr].target>40){
@@ -208,7 +208,7 @@ function shoot(playernr){
             players[playernr].bullets[i].currentpixel= playcollection[playernr].position.x;
             break;
         }
-    }    
+    }
 }
 </script>
 <script type="text/paperscript" canvas="canvas-1">
@@ -227,7 +227,7 @@ for(var i=0;i<5*bulletcount;i++){
     bulletpoints[i] = new Raster({
         image: document.getElementById('shoot'),
         center:{x:-100,y:-100}
-    }); 
+    });
     if (scale) bulletpoints[i].scale(scale);
 }
 eq = new Path();
@@ -288,7 +288,7 @@ function initFromMP3(url) {
     context = new AudioContext();
     javascriptNode = context.createScriptProcessor(256, 2, 1);
     javascriptNode.connect(context.destination);
-    
+
     analyser = context.createAnalyser();
 
     var audio = new Audio();
@@ -311,14 +311,14 @@ function initAudio(stream) {
     context = new webkitAudioContext();
     javascriptNode = context.createScriptProcessor(256, 2, 1);
     javascriptNode.connect(context.destination);
-    
+
     analyser = context.createAnalyser();
 
     // Connect audio processing graph:
     // live-input -> analyser -> destination
 
     // Create an AudioNode from the stream.
-    var mediaStreamSource = context.createMediaStreamSource(stream);    
+    var mediaStreamSource = context.createMediaStreamSource(stream);
     mediaStreamSource.connect(analyser);
     analyser.connect(context.destination);
     javascriptNode.onaudioprocess = function() {
@@ -345,7 +345,7 @@ var averagevolume=0;
 var velocity=0;
 var gravity=.9;
 function onKeyDown(event) {
-	
+
 }
 playerheight=5;
 var height = view.size.height;
@@ -509,7 +509,7 @@ function onFrame(event) {
                         }
                     }
                 }
-    
+
             }
 
 			velocity-=gravity;
@@ -522,7 +522,7 @@ function onFrame(event) {
                 if(typeof e.note !=='undefined'){
                     var n=createEnemy(e.note, e.channel);
                     evildoers.splice(i,1,n);
-           
+
                 }else{
                     e.position.x-=view.size.width / points;
                     if(e.position.x<0){
@@ -605,14 +605,14 @@ function onFrame(event) {
             enemy = new Raster({
                 image: document.getElementById('pbjt_'+pbjtIndex),
                 position: {x:path.segments[127].point.x,y:yPos}
-            }); 
+            });
             enemy.pbjt = true;
             if (scale) enemy.scale(scale);
         } else {
             enemy = new Raster({
                 source: enemyImages[ channel%3 ],
                 position: {x:path.segments[127].point.x,y:yPos}
-            }); 
+            });
             if (scale) enemy.scale(scale);
         }
         return enemy;
@@ -622,9 +622,9 @@ function onFrame(event) {
         var heightOffset = player.height/2;
         return (
             player.opacity === 1 &&
-            player.position.x>enemy.position.x-20 && 
-            player.position.x<enemy.position.x+20 && 
-            player.position.y>enemy.position.y-heightOffset && 
+            player.position.x>enemy.position.x-20 &&
+            player.position.x<enemy.position.x+20 &&
+            player.position.y>enemy.position.y-heightOffset &&
             player.position.y<enemy.position.y+heightOffset
         );
     }

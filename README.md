@@ -1,40 +1,65 @@
-Sound Defender
-=======
+# Sound Defender
 
 Defender-like game, where enemies are rendered based on MIDI data, landscape based on audio,
 and where the planes are controlled remotely with a smartphone or tablet.
 
-Installation
-=======
+## Changes by MiX
+* we've moved everything to ```app/public/``` and moved the content from ```sound-defender-backend/``` to the ```app/``` folder so everything accesible from the same project.
+* we've updated the file references accordingly.
+* we've change every absolute reference of socket.io to a relative reference so that there are no hardcode ip adresses in the code.
+* we've chnaged ```app.listen()``` so that we can run the server on a port other than port 3000.
+* added a ```.gitignore```
+* updated readme so that it matches the other hacks from the hacktathon
 
-* Install the backend server from https://github.com/myster0n/sound-defender-backend
-```
-  git clone https://github.com/myster0n/sound-defender-backend.git
-  cd sound-defender-backend
-  npm install
-  nodejs index.js
-```
+## Installation
 
-* Check out these static files and put them on a web server
-```
-  git clone https://github.com/LennartC/sound-defender.git
-```
+### Install Node.js
+* Get Node.js from http://nodejs.org
+* Install it
 
-* open host.html and index.html in a text editor, and change the location of socket.io:
+### Install Dependencies
+Run
+    
+    npm install
 
-  <pre>
-  ...
-  &lt;script src="http://lacerta.be/socket.io/socket.io.js"&gt;&lt;/script&gt;
-  ...
-  var socket = io.connect('http://lacerta.be');
-  </pre>
+from the ```app/``` folder.
 
-* In host.html, change the location of the MIDI api:
+## Running the code
 
-  <pre>
-  &lt;script src="http://mixmini.mixlab.be:3000/javascripts/api.js" type='text/javascript'&gt;&lt;/script&gt;
-  <pre>
+run
 
-* Plug in the audio cable on your desktop pc, open your desktop browser and go to http://your_web_server/sound-defender/host.html
+    node app.js
 
-* With your smartphone, go to http://your_web_server/sound-defender/ and if a plane is assigned to you, start playing! 
+from the ```app/``` folder.
+
+Or run
+
+    PORT=4000 node app.js
+
+To run it on another port (eg port 4000)
+
+
+### Visuals
+
+Plug in the audio cable on your desktop pc, open your desktop browser and go to
+
+    http://localhost:3000/host.html
+
+### Smartphone interface
+
+With your smartphone, go to 
+
+    http://localhost:3000/
+
+and if a plane is assigned to you, start playing!
+
+## MIDI input
+
+This project uses the MIDI data that was available at the hackthon.
+
+In ```public/host.html``, change the location of the MIDI api if nessesary:
+
+     <script src="http://mixmini.mixlab.be:3000/javascripts/api.js" type='text/javascript'></script>
+
+
+If you want to run the MIDI api yourself, you can clone the ```https://github.com/mixbe/mixmidi``` project.

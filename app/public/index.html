@@ -104,10 +104,10 @@
     }
   </style>
 
-  <script src="http://lacerta.be/socket.io/socket.io.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
   <script src="elem.js"></script>
   <script>
-  var socket = io.connect('http://lacerta.be');
+  var socket = io.connect(window.location.hostname);
   socket.on('connect', function () {
      socket.emit("client");
   })
@@ -116,7 +116,7 @@
   })
   socket.on('dead', function(data) {
     document.getElem(".theScore").setText(data.score);
-    document.getElem(".share .twitter").attrib("data-prefilltext", 
+    document.getElem(".share .twitter").attrib("data-prefilltext",
         "Just scored "+data.score+" points playing sound defender vs @CDDofficial at @ABconcerts");
      document.getElem("body").style.backgroundColor = 'transparent';
      document.getElem(".loser").style.display = 'block';
